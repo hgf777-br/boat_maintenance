@@ -16,7 +16,7 @@ services:
       bash -c "python manage.py makemigrations &&
                 python manage.py migrate &&
                 python manage.py collectstatic --noinput &&
-                python manage.py createsuperuser --noinput &&
+                # python manage.py createsuperuser --noinput &&
                 gunicorn boat_maintenance.wsgi:application --bind 0.0.0.0:8000 --access-logfile - --error-logfile - --capture-output --log-level debug --workers 4 --threads 4
                 "
     volumes:
