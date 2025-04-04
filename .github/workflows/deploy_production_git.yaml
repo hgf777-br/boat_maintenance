@@ -1,0 +1,35 @@
+name: Production Deploy with GIT
+
+on:
+    workflow_dispatch:
+
+jobs:
+    # deploy de Desenvolvimento
+    deploy:
+        runs-on: ubuntu-latest
+        environment:
+            name: boat
+            url: http://hgf777.net.br
+        steps:
+            - name: Repository Checkout
+              uses: actions/checkout@v4
+            - name: Development Deploy
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                host: ${{vars.REMOTE_HOST}}
+                username: ${{vars.REMOTE_USER}}
+                password: ${{secrets.PASSWORD}}
+                port: ${{vars.REMOTE_PORT}}
+                script: |
+                  ls
+                  # cd boat_maintenance
+                  # git pull
+                  # cp "enviroments/.env" ".env"
+                  # source .venv/bin/activate
+                  # python3 --version
+                  # python3 manage.py collectstatic --noinput
+                  # python3 manage.py migrate
+                  # deactivate
+                  # sudo systemctl stop nginx
+                  # sudo systemctl stop gunicorn
+                  # sudo systemctl start nginx
