@@ -21,9 +21,8 @@ jobs:
                 password: ${{secrets.PASSWORD}}
                 port: ${{vars.REMOTE_PORT}}
                 script: |
-                  ls
-                  # cd boat_maintenance
-                  # git pull
+                  cd boat_maintenance
+                  git pull
                   # cp "enviroments/.env" ".env"
                   # source .venv/bin/activate
                   # python3 --version
