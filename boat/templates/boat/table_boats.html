@@ -1,0 +1,234 @@
+{% extends "partials/base_table.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    table a, button {
+        opacity: 0.7;
+    }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <h3>Barcos</h3>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'boat:create-boat' %}" class="btn btn-primary btn-sm">Novo Barco</a>
+        </div>
+        <hr>
+    </div>
+    <table class="table" id="table">
+        <thead>
+            <tr>
+                <th scope="col">nome</th>
+                <th scope="col">cotas</th>
+                <th scope="col">fabricante</th>
+                <th scope="col">modelo</th>
+                <th scope="col">ano</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for boat in boats_list %}
+            <tr>
+                <td>{{ boat.name }}</td>
+                <td>{{ boat.number_shares }}</td>
+                <td>{{ boat.manufacturer }}</td>
+                <td>{{ boat.model }}</td>
+                <td>{{ boat.year_built }}</td>
+                <td>{{ boat.id }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}
+
+{% block extra_javascript %}
+<script>
+    $(function() {
+        $('#table').DataTable(
+            {
+                deferRender: true,
+                responsive: true,
+                columns: [
+                    {data: 'name'},
+                    {data: 'number_shares'},
+                    {data: 'manufacturer'},
+                    {data: 'model'},
+                    {data: 'year_built'},
+                    {data: 'id',
+                        render: function(data, type, row) {
+                            return  `<div class="d-flex">
+                                    <button type="button" id="button-share-owners-${data}" class="btn btn-warning p-1 me-1 button-share-owners" title="criar nova senha">
+                                    <i class="bi bi-person"></i></button>
+                                    <a href="update/${data}" class="btn btn-primary p-1 me-1" title="editar"
+                                    id="update-${data}"><i class="bi bi-pencil"></i></a>
+                                    <button type="button" id="button-delete-${data}" class="btn btn-danger p-1 me-2 button-delete" title="criar nova senha">
+                                    <i class="bi bi-trash"></i></button>
+                                    </div>`;
+                        }
+                    }
+                ],
+                columnDefs: [
+                    { responsivePriority: 1, targets: 0 },
+                    { responsivePriority: 2, targets: -1 },
+                    { orderable: false, targets: -1 },
+                    { width: "5%", targets:-1},
+                ],
+            }
+        );
+    });
+
+    // Sistema para definir os cotistas do barco
+    $(document).on('click', '.button-share-owners', function() {
+        const boat_id = $(this).attr('id').split('-')[3];
+        const users = JSON.parse('{{ users|safe }}');
+        let number_shares = 0;
+        Swal.fire({
+            title: 'Cotistas',
+            theme: '{{ request.user.get_theme_display }}',
+            buttonsStyling: false,
+            showCancelButton: true,
+            confirmButtonText: "alterar",
+            cancelButtonText: "cancelar",
+            customClass: {
+                confirmButton: 'btn btn-success btn-lg me-2',
+                cancelButton: 'btn btn-danger btn-lg',
+                loader: 'custom-loader',
+            },
+            loaderHtml: '<div class="spinner-border text-primary"></div>',
+            html:`
+            <div id="fields-share-owners"></div>
+            {% csrf_token %}
+            `,
+            willOpen: function() {
+                const html_content = $('#fields-share-owners');
+                const url = "{% url 'boat:details-list-boat' %}";
+                fetch(url)
+                .then(response => response.json())  
+                .then(data => {
+                    console.log('data', data[boat_id])
+                    const boat = data[boat_id];
+                    number_shares = boat.number_shares;
+                    let select_items = "<option value=0>sem cotista</option>\n";
+                    for (user of users) {
+                        select_items += `<option value=${user.id}>${user.name}</option>\n`;
+                    }
+                    for (let i = 0; i < number_shares; i++) {
+                        const owner = boat.share_owners[i] ? boat.share_owners[i] : 0;
+                        html_content.append(`
+                        <div class="form-floating mb-2">
+                            <select type="text" id="share-${i}" class="form-select" placeholder="#">
+                                ${select_items}
+                            </select>
+                            <label>Cotista ${i + 1}</label>
+                        </div>`
+                        );
+                        document.getElementById(`share-${i}`).value = owner;
+                    }
+                });
+                
+            },
+            preConfirm: function () {
+                return new Promise(function (resolve) {
+                    const owners = []
+                    for (let i = 0; i < number_shares; i++) {
+                        owners.push(document.getElementById(`share-${i}`).value)
+                    }
+                    //Swal.enableButtons();
+                    resolve(owners);
+                })
+            },
+            didOpen: function () {
+                // document.getElementById('share-0').focus();
+            }
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                const url = "{% url 'boat:update-owners-boat' %}";
+                const user_id = "{{ request.user.id }}";
+                const owners = result.value;
+                fetch(url, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        user_id: user_id,
+                        boat_id: boat_id,
+                        owners: owners,
+                    }),
+                    headers: {
+                        "Content-type": "application/json; charset=UTF-8",
+                        "X-CSRFToken": "{{csrf_token}}"
+                    },
+                    credentials: 'same-origin',})
+                .then(response => response.json())  
+                .then(data => {
+                    if (data.status === 'ok') {
+                        Toast.fire({
+                            icon: "success",
+                            title: data.message,
+                            background: "#B0FFB0",
+                        });
+                    } else {
+                        Toast.fire({
+                            icon: "error",
+                            title: data.message,
+                            background: "#FFB0B0",
+                        });
+                    }
+                    // ocation.reload();
+                })    
+                .catch(error => console.error(error));
+            }
+        }).catch(function(event) {
+            console.log(`erro na troca de senha: ${event}`);
+        });
+    });
+
+    $(document).on('click', '.button-delete', function() {
+        const id = $(this).attr('id').split('-')[2];
+        const table_line = $(this).closest('tr');
+        const boat_name = table_line.find("td:eq(0)").text();
+        Swal.fire({
+            title: "Você tem certeza?",
+            text: `você vai apagar o barco: ${boat_name}`,
+            icon: "warning",
+            theme: '{{ request.user.get_theme_display }}',
+            buttonsStyling: false,
+            showCancelButton: true,
+            confirmButtonText: "apagar",
+            customClass: {
+                confirmButton: 'btn btn-success btn-lg me-2',
+                cancelButton: 'btn btn-danger btn-lg',
+                loader: 'custom-loader',
+            },
+            loaderHtml: '<div class="spinner-border text-primary"></div>',
+        })
+        .then((result) => {
+            if (result.isConfirmed) {
+                const url = "{% url 'boat:delete-boat' 1 %}".replace('1', id);
+                fetch(url, {method: "GET",})
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        Toast.fire({
+                            icon: "success",
+                            title: data.message,
+                            background: "#B0FFB0",
+                        });
+                        // Atualizar a lista de barcos após a exclusão
+                        table_line.remove();
+                    } else {
+                        Toast.fire({
+                            icon: "error",
+                            title: data.message,
+                            background: "#FFB0B0",
+                        });
+                    }
+                    }) 
+                .catch(error => console.error(error));
+            } 
+        });
+    })
+</script>
+{% endblock extra_javascript %}

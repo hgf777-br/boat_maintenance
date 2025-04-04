@@ -1,0 +1,86 @@
+{% extends "partials/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col">
+        <h3>Novo Técnico</h3>
+        <hr>
+    </div>
+</div>
+<form method="POST" class="needs-validation" novalidate>
+    {% csrf_token %}
+    <div class="row mb-4 g-2">
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.name }}
+                <label for="name" class="form-label">{{ form.name.label }}</label>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="form-floating">
+                {{ form.email }}
+                <label for="email" class="form-label">{{ form.email.label }}</label>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4 g-2">
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.phone }}
+                <label for="phone" class="form-label">{{ form.phone.label }}</label>
+                <div class="invalid-feedback">Apenas números neste campo</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.speciality }}
+                <label for="speciality" class="form-label">{{ form.speciality.label }}</label>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col">
+            <div class="float-end mb-3 me-2">
+                <button type="submit" class="btn btn-outline-success">Cadastrar</button>
+                <a href="{% url 'technician:table-technicians' %}" class="btn btn-outline-danger ms-2">Cancelar</a>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock content %}
+
+{% block extra_javascript %}
+<script src="{% static 'js/imask.js' %}" crossorigin="anonymous"></script>
+<script>
+    (() => {
+        'use strict'
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll('.needs-validation')
+        const form = document.querySelector('.needs-validation')
+        const phone = document.getElementById('id_phone');
+        const phone_mask = IMask(phone, {mask: '(00)00000-0000'})
+        
+        // Loop over them and prevent submission
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    console.log('erro')
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false)
+        })
+
+        form.addEventListener('submit', event => {
+            event.preventDefault();
+            phone.value = phone_mask.unmaskedValue;
+            form.submit();
+        })
+
+    })()
+</script>
+{% endblock extra_javascript %}

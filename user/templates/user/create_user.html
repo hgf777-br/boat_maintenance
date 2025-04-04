@@ -1,0 +1,174 @@
+{% extends "partials/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col">
+        <h3>Novo Usuário</h3>
+        <hr>
+    </div>
+</div>
+<form method="POST" class="needs-validation" novalidate>
+    {% csrf_token %}
+    <div class="row mb-4 g-2">
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.username }}
+                <label for="username" class="form-label">{{ form.username.label }}</label>
+                <div class="invalid-feedback">Apenas letras e números com no mínimo 3 caracteres</div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="form-floating">
+                {{ form.email }}
+                <label for="email" class="form-label">{{ form.email.label }}</label>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4 g-2">
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.phone }}
+                <label for="phone" class="form-label">{{ form.phone.label }}</label>
+                <div class="invalid-feedback">Apenas números neste campo</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.profile }}
+                <label for="profile" class="form-label">{{ form.profile.label }}</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.theme }}
+                <label for="theme" class="form-label">{{ form.theme.label }}</label>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4 g-2">
+        <div class="col-md">
+            <div class="form-floating">
+                {{ form.first_name }}
+                <label for="first_name" class="form-label">{{ form.first_name.label }}</label>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="form-floating">
+                {{ form.last_name }}
+                <label for="last_name" class="form-label">{{ form.last_name.label }}</label>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4 g-2">
+        <div class="col-md">
+            <div class="form-floating">
+                {{ form.password }}
+                <label for="password" class="form-label">{{ form.password.label }}</label>
+                <div class="invalid-feedback">Mínimo de 8 caracteres, somente letras e números</div>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="form-floating" id="password-confirm-floating">
+                <input type="password" class="form-control" id="password-confirm"  placeholder="#" required>
+                <label for="password-confirm" class="form-label">Confirme a Senha</label>
+                <div class="invalid-feedback">As senhas não conferem</div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col">
+            <div class="float-end mb-3 me-2">
+                <button type="submit" class="btn btn-outline-success">Cadastrar</button>
+                <a href="{% url 'user:table-users' %}" class="btn btn-outline-danger ms-2">Cancelar</a>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock content %}
+
+{% block extra_javascript %}
+<script>
+    function change_validity(element, validity) {
+        if (!validity) {
+            element.classList.add('is-invalid');
+            element.setCustomValidity("Invalid field.");
+        } else {
+            element.classList.remove('is-invalid');
+            element.setCustomValidity("");
+        }
+    }
+
+    function check_username_validity(username) {
+        const pattern = /^\w+$/;
+        const validity = username.value.length >= 3 && pattern.test(username.value);
+        change_validity(username, validity);
+        return validity;
+    }
+
+    function check_phone_validity(phone) {
+        const pattern = /^[\+\d]+$/;
+        const validity = pattern.test(phone.value);
+        change_validity(phone, validity);
+        return validity;
+    }
+    
+    function check_password_confirm_validity(password_confirm, password) {
+        const validity = password.value && password_confirm.value === password.value
+        change_validity(password_confirm, validity)
+        return validity;
+    }
+
+    function check_password_validity(password) {
+        const pattern = /^\w{8,}$/;
+        const validity = pattern.test(password.value);
+        change_validity(password, validity);
+        return validity;
+    }
+
+    (() => {
+        'use strict'
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll('.needs-validation')
+        const password_confirm = document.getElementById('password-confirm');
+        const password = document.getElementById('id_password');
+        const username = document.getElementById('id_username');
+        const phone = document.getElementById('id_phone');
+        
+        // Loop over them and prevent submission
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()
+                || !check_username_validity(username)
+                || !check_phone_validity(phone)
+                || !check_password_validity(password)
+                || !check_password_confirm_validity(password_confirm, password)) {
+                    console.log('erro')
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false)
+        })
+
+        password.addEventListener('keyup', event => {
+            check_password_validity(password);
+        });
+
+        password_confirm.addEventListener('keyup', event => {
+            check_password_confirm_validity(password_confirm, password);
+        });
+
+        username.addEventListener('keyup', event => {
+            check_username_validity(username);
+        });
+
+        phone.addEventListener('keyup', event => {
+            check_phone_validity(phone);
+        });
+
+    })()
+</script>
+{% endblock extra_javascript %}

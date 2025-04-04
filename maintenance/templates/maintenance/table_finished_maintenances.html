@@ -1,0 +1,95 @@
+{% extends "partials/base_table.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    table a, button {
+        opacity: 0.7;
+    }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <h3>Manutenções <span class="h6">finalizadas</span></h3>
+        </div>
+        <hr>
+    </div>
+    <table class="table" id="table">
+        <thead>
+            <tr>
+                <th scope="col">barco</th>
+                <th scope="col">data finalização</th>
+                <th scope="col">setor</th>
+                <th scope="col">descrição</th>
+                <th scope="col">responsável</th>
+                <th scope="col">tecnico</th>
+                <th scope="col">hora do motor</th>
+                <th scope="col">observações</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for maintenance in maintenances_list %}
+            <tr>
+                <td>{{ maintenance.boat }}</td>
+                <td>{{ maintenance.finish_date|date:"SHORT_DATE_FORMAT" }}</td>
+                <td>{{ maintenance.get_sector_display }}</td>
+                <td>{{ maintenance.description }}</td>
+                <td>{{ maintenance.creator }}</td>
+                <td>{{ maintenance.technician|default:"" }}</td>
+                <td>{{ maintenance.engine_hours|default:"" }}</td>
+                <td>{{ maintenance.observation }}</td>
+                <td>{{ maintenance.id }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}
+
+{% block extra_javascript %}
+<script>
+    $(function() {
+        $('#table').DataTable(
+            {
+                deferRender: true,
+                responsive: true,
+                order: [[1, 'dsc']],
+                columnDefs: [
+                    { targets: 0, responsivePriority: 1 },
+                    { targets: -1, responsivePriority: 2 },
+                    { targets: -1, orderable: false },
+                    { targets: -1, width: "5%"},
+                    { targets: -1, 
+                        render: function(data, type, row) {
+                                    return  `<div class="d-flex">
+                                            <button type="button" id="button-info-${data}" class="btn btn-info p-1 me-1 button-info" title="informação">
+                                            <i class="bi bi-info-lg"></i></button>
+                                            </div>`;
+                                }
+                    },
+                ],
+            }
+        );
+    });
+
+    $(document).on('click', '.button-info', function() {
+        const id = $(this).attr('id').split('-')[2];
+        const table_line = $(this).closest('tr');
+        const descricao = table_line.find("td:eq(2)").text();
+        Swal.fire({
+            title: "Informação",
+            text: `informação da manutenção`,
+            theme: '{{ request.user.get_theme_display }}',
+            buttonsStyling: false,
+            showCancelButton: true,
+            customClass: {
+                cancelButton: 'btn btn-danger btn-lg',
+                loader: 'custom-loader',
+            },
+            loaderHtml: '<div class="spinner-border text-primary"></div>',
+        });
+    })
+</script>
+{% endblock extra_javascript %}

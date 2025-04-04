@@ -1,0 +1,202 @@
+{% extends "partials/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load boat_extras %}
+{% block extra_css%}
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/css/datepicker.min.css'>   
+{% endblock extra_css%}
+
+{% block content %}
+<form method="POST" class="needs-validation" novalidate>
+    {% csrf_token %}
+    <div class="row mb-2 g-2 align-items-end">
+        <div class="col-md-8">
+            <h3 class="align-bottom">Nova Manutenção Periódica</h3>
+        </div>
+        {% if request.user.profile != "SO" %}
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.boat }}
+                <label for="boat" class="form-label">{{ form.boat.label }}</label>
+            </div>
+        </div>
+        {% else %}
+        <input class="d-none" name="boat" id="id_boat" value="{{ request.user|boat }}" >
+        {% endif %}
+    </div>
+    <hr>
+    <div class="row mb-4 g-2">
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.sector }}
+                <label for="sector" class="form-label">{{ form.sector.label }}</label>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4 g-2">
+        <div class="col">
+            <div class="form-floating">
+                {{ form.description }}
+                <label for="description" class="form-label">{{ form.description.label }}</label>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4 g-2">
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.periodicity }}
+                <label for="periodicity" class="form-label">{{ form.periodicity.label }}</label>
+            </div>
+        </div>
+        <div class="col-md-4" id="day-field">
+            <div class="form-floating">
+                {{ form.periodicity_day }}
+                <label for="periodicity_day" class="form-label">{{ form.periodicity_day.label }}</label>
+            </div>
+        </div>
+        <div class="col-md-4 d-none" id="week-day-field">
+            <div class="form-floating">
+                {{ form.periodicity_week_day }}
+                <label for="periodicity_week_day" class="form-label">{{ form.periodicity_week_day.label }}</label>
+            </div>
+        </div>
+        <div class="col-md-4 d-none" id="month-field">
+            <div class="form-floating">
+                {{ form.periodicity_month }}
+                <label for="periodicity_month" class="form-label">{{ form.periodicity_month.label }}</label>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col">
+            <div class="float-end mb-3 me-2">
+                <button type="submit" class="btn btn-outline-success">Cadastrar</button>
+                <a href="{% url 'maintenance:table-periodics' %}" class="btn btn-outline-danger ms-2">Cancelar</a>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock content %}
+
+{% block extra_javascript %}
+<script src='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/js/datepicker-full.min.js'></script>
+<script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/js/locales/pt-BR.js"></script>
+<script>
+    const CODES_MONTH = ['QU', 'SA', 'AN']
+    const CODES_DAY = ['MO', 'QU', 'SA', 'AN']
+    const CODES_WEEK_DAY = ['WE', 'BW']
+
+    function change_validity(element, validity) {
+        if (!validity) {
+            element.classList.add('is-invalid');
+            element.setCustomValidity("Invalid field.");
+        } else {
+            element.classList.remove('is-invalid');
+            element.setCustomValidity("");
+        }
+    }
+
+    function check_periodicity_day_validity(periodicity_day, periodicity) {
+        validity = !CODES_DAY.includes(periodicity.value) || (CODES_DAY.includes(periodicity.value) && periodicity_day.value != '');
+        console.log('day', validity, periodicity.value)
+        change_validity(periodicity_day, validity);
+        return validity
+    }
+    
+    function check_periodicity_week_day_validity(periodicity_week_day, periodicity) {
+        validity = !CODES_WEEK_DAY.includes(periodicity.value) || (CODES_WEEK_DAY.includes(periodicity.value) && periodicity_week_day.value!= '');
+        console.log('week', validity, periodicity.value)
+        change_validity(periodicity_week_day, validity);
+        return validity
+    }
+
+    function check_periodicity_month_validity(periodicity_month, periodicity) {
+        validity = !CODES_MONTH.includes(periodicity.value) || CODES_MONTH.includes(periodicity.value) && periodicity_month.value !== '';
+        console.log('month', validity, periodicity.value)
+        change_validity(periodicity_month, validity);
+        return validity
+    }
+
+    function display_fields_by_periodicity(periodicity) {
+        switch(periodicity) {
+            case 'MO':
+                document.getElementById('day-field').classList.remove('d-none');
+                document.getElementById('week-day-field').classList.add('d-none');
+                document.getElementById('month-field').classList.add('d-none');
+                break;
+                case 'WE':
+                case 'BW':
+                document.getElementById('week-day-field').classList.remove('d-none');
+                document.getElementById('day-field').classList.add('d-none');
+                document.getElementById('month-field').classList.add('d-none');
+                break;
+                case 'ME':
+                document.getElementById('day-field').classList.add('d-none');
+                document.getElementById('week-day-field').classList.add('d-none');
+                document.getElementById('month-field').classList.remove('d-none');
+                break;
+                case 'QU':
+                case 'SA':
+                case 'AN':
+                document.getElementById('day-field').classList.remove('d-none');
+                document.getElementById('month-field').classList.remove('d-none');
+                document.getElementById('week-day-field').classList.add('d-none');
+                break;
+                default:
+        }
+    }
+
+    (() => {
+        'use strict'
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll('.needs-validation');
+        // Get all fields who needs validation
+        const periodicity = document.getElementById('id_periodicity');
+        const periodicity_day = document.getElementById('id_periodicity_day');
+        const periodicity_week_day = document.getElementById('id_periodicity_week_day');
+        const periodicity_month = document.getElementById('id_periodicity_month');
+        // Display right fields
+        display_fields_by_periodicity(periodicity.value)
+
+        
+        // Loop over them and prevent submission
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                const day_validity = check_periodicity_day_validity(periodicity_day, periodicity);
+                const week_day_validity = check_periodicity_week_day_validity(periodicity_week_day, periodicity);
+                const month_validity = check_periodicity_month_validity(periodicity_month, periodicity);
+                console.log('erro_day', CODES_DAY.includes(periodicity.value) && !day_validity)
+                console.log('erro_week', CODES_WEEK_DAY.includes(periodicity.value) && !week_day_validity)
+                console.log('erro_month', CODES_MONTH.includes(periodicity.value) &&!month_validity)
+                console.log('erro', !form.checkValidity())
+                if (!form.checkValidity()) {
+                    console.log('erro')
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false)
+        })
+
+        periodicity.addEventListener('change', () => {
+            display_fields_by_periodicity(periodicity.value)
+            check_periodicity_day_validity(periodicity_day, periodicity);
+            check_periodicity_week_day_validity(periodicity_week_day, periodicity);
+            check_periodicity_month_validity(periodicity_month, periodicity)
+        })
+
+        periodicity_day.addEventListener('change', () => {
+            check_periodicity_day_validity(periodicity_day, periodicity);
+        })
+        periodicity_week_day.addEventListener('change', () => {
+            check_periodicity_week_day_validity(periodicity_week_day, periodicity);
+        })
+        periodicity_month.addEventListener('change', () => {
+            check_periodicity_day_validity(periodicity_day, periodicity);
+            check_periodicity_month_validity(periodicity_month, periodicity);
+        })
+
+    })()
+</script>
+{% endblock extra_javascript %}

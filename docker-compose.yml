@@ -1,0 +1,42 @@
+services:
+  web-server:
+    build: .
+    env_file:
+      - ./.env
+    command: >
+      bash -c "python manage.py makemigrations &&
+                python manage.py migrate &&
+                python manage.py collectstatic --noinput &&
+                # python manage.py createsuperuser --noinput &&
+                gunicorn boat_maintenance.wsgi:application --bind 0.0.0.0:8000 --access-logfile - --error-logfile - --capture-output --log-level debug --workers 4 --threads 4
+                "
+    volumes:
+      - static_volume:/home/app/staticfiles
+    expose:
+      - 8000
+    depends_on:
+      - db
+
+  db:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./create-db.sql:/docker-entrypoint-initdb.d/create_database.sql
+    environment:
+      - POSTGRES_USER=hgf777
+      - POSTGRES_PASSWORD=hgf@boat
+
+  nginx:
+    build: ./nginx
+    volumes:
+      # - /etc/letsencrypt/:/etc/letsencrypt/
+      - static_volume:/home/app/staticfiles
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - web-server
+
+volumes:
+  postgres_data: {}
+  static_volume: {}

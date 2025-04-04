@@ -1,0 +1,7 @@
+{% load allauth %}
+{% load static %}
+<a class="btn"
+   title="{{ attrs.name }}"
+   href="{{ attrs.href }}">
+   <img alt="{{ attrs.name }}" src="{% static 'images/logos/' %}{{ attrs.name }}.png" width="40px"> {{ attrs.name }}
+</a>

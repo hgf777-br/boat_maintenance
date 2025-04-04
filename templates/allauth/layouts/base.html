@@ -1,0 +1,52 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Boat Maintenance APP">
+        <meta name="author" content="Henrique Faria">
+        <meta name="generator" content="hgf777">
+        <title>
+            {% block head_title %}
+            {% endblock head_title %} | Boat Maintenance
+        </title>
+        {% block extra_head %}
+        {% endblock extra_head %}
+
+        <!-- App favicon -->
+        <link rel="icon" type="image/png" href="{% static 'images/icons/favicon-96x96.png' %}" sizes="96x96" />
+        <link rel="icon" type="image/svg+xml" href="{% static 'images/icons/favicon.svg' %}" />
+        <link rel="shortcut icon" href="{% static 'images/icons/favicon.ico' %}" />
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/icons/apple-touch-icon.png' %}" />
+        <link rel="manifest" href="{% static 'images/icons/site.webmanifest' %}" />
+        
+        <!-- Fonts for Site -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+
+        <!-- Bootstrap core CSS -->
+        <link rel="stylesheet" href="{% static 'css\bootstrap.min.css' %}">
+
+        <!--- Style for body -->
+        <style>
+            body {
+                font-family: Oxanium, Noto Sans, Arial, sans-serif;
+                background-color: #a3c8ff;
+            }
+        </style>
+        <!-- Extra CSS by page -->
+        {% block extra_css %}
+        {% endblock extra_css %}
+    </head>
+    <body>
+        {% block body %}
+            {% block content %}
+            {% endblock content %}
+        {% endblock body %}
+        {% block extra_body %}
+        {% endblock extra_body %}
+    </body>
+</html>

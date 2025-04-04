@@ -1,0 +1,161 @@
+{% extends "partials/base_table.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    table a, button {
+        opacity: 0.7;
+    }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <h3>Usuários</h3>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'user:create-user' %}" class="btn btn-primary btn-sm">Novo Usuário</a>
+        </div>
+        <hr>
+    </div>
+    <table class="table" id="table">
+        <thead>
+            <tr>
+                <th scope="col">usuário</th>
+                <th scope="col">perfil</th>
+                <th scope="col">email</th>
+                <th scope="col">nome</th>
+                <th scope="col">sobrenome</th>
+                <th scope="col">telefone</th>
+                <th scope="col">tema</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users_list %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.get_profile_display }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.first_name }}</td>
+                <td>{{ user.last_name }}</td>
+                <td>{{ user.phone }}</td>
+                <td>{{ user.get_theme_display }}</td>
+                <td>{{ user.id }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}
+
+{% block extra_javascript %}
+<script>
+    $(function() {
+        $('#table').DataTable(
+            {
+                deferRender: true,
+                responsive: true,
+                columns: [
+                    {data: 'username'},
+                    {data: 'profile'},
+                    {data: 'email'},
+                    {data: 'first_name'},
+                    {data: 'last_name'},
+                    {data: 'phone'},
+                    {data: 'theme'},
+                    {data: 'id',
+                        render: function(data, type, row) {
+                            return  `<div class="d-flex">
+                                    <button type="button" id="new-password-${data}" class="btn btn-warning p-1 me-1 button-new-password" title="criar nova senha">
+                                    <i class="bi bi-key"></i></button>
+                                    <a href="update/${data}" class="btn btn-primary p-1 me-1" title="editar"
+                                    id="update-${data}"><i class="bi bi-pencil"></i></a>
+                                    <button type="button" id="new-password-${data}" class="btn btn-danger p-1 me-2 button-delete" title="criar nova senha">
+                                    <i class="bi bi-trash"></i></button>
+                                    </div>`;
+                        }
+                    }
+                ],
+                columnDefs: [
+                    { responsivePriority: 1, targets: 0 },
+                    { responsivePriority: 2, targets: -1 },
+                    { orderable: false, targets: -1 },
+                    { width: "5%", targets:-1},
+                ],
+            }
+        );
+    });
+
+    $(document).on('click', '.button-new-password', function() {
+        // enviar email com uma nova senha para o usuário
+        console.log('enviar email com nova senha')
+        const id = $(this).attr('id').split('-')[2];
+        const url = "{% url 'user:send-new-password-user' 1 %}".replace('1', id);
+        fetch(url, {method: "GET",})
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'ok') {
+                Toast.fire({
+                    icon: "success",
+                    title: data.message,
+                    background: "#B0FFB0",
+                });
+            } else {
+                Toast.fire({
+                    icon: "error",
+                    title: data.message,
+                    background: "#FFB0B0",
+                });
+            }
+            }) 
+        .catch(error => console.error(error));
+    });
+
+    $(document).on('click', '.button-delete', function() {
+        const id = $(this).attr('id').split('-')[2];
+        const table_line = $(this).closest('tr');
+        const username = table_line.find("td:eq(0)").text();
+        Swal.fire({
+            title: "Você tem certeza?",
+            text: `você vai apagar o usuário: ${username}`,
+            icon: "warning",
+            theme: '{{ request.user.get_theme_display }}',
+            buttonsStyling: false,
+            showCancelButton: true,
+            confirmButtonText: "apagar",
+            customClass: {
+                confirmButton: 'btn btn-success btn-lg me-2',
+                cancelButton: 'btn btn-danger btn-lg',
+                loader: 'custom-loader',
+            },
+            loaderHtml: '<div class="spinner-border text-primary"></div>',
+        })
+        .then((result) => {
+            if (result.isConfirmed) {
+                const url = "{% url 'user:delete-user' 1 %}".replace('1', id);
+                fetch(url, {method: "GET",})
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        Toast.fire({
+                            icon: "success",
+                            title: data.message,
+                            background: "#B0FFB0",
+                        });
+                        // Atualizar a lista de usuários após a exclusão
+                        table_line.remove();
+                    } else {
+                        Toast.fire({
+                            icon: "error",
+                            title: data.message,
+                            background: "#FFB0B0",
+                        });
+                    }
+                    }) 
+                .catch(error => console.error(error));
+            } 
+        });
+    })
+</script>
+{% endblock extra_javascript %}

@@ -1,0 +1,335 @@
+{% extends "partials/base_table.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    table a, button {
+        opacity: 0.7;
+    }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <h3>Manutenções <span class="h6">pendentes</span></h3>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'maintenance:create-maintenance' %}" class="btn btn-primary btn-sm">Nova Manutenção</a>
+        </div>
+        <hr>
+    </div>
+    <table class="table" id="table">
+        <thead>
+            <tr>
+                <th scope="col">barco</th>
+                <th scope="col">data limite</th>
+                <th scope="col">Periódica</th>
+                <th scope="col">setor</th>
+                <th scope="col">descrição</th>
+                <th scope="col">responsável</th>
+                <th scope="col">data agendada</th>
+                <th scope="col">tecnico</th>
+                <th scope="col">observações</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for maintenance in maintenances_list %}
+            <tr>
+                <td>{{ maintenance.boat }}</td>
+                <td>{{ maintenance.due_date|date:"Y-m-d" }}</td>
+                <td>{{ maintenance.periodic }}</td>
+                <td>{{ maintenance.get_sector_display }}</td>
+                <td>{{ maintenance.description }}</td>
+                <td>{{ maintenance.creator }}</td>
+                <td>{{ maintenance.schedule_date|date:"SHORT_DATE_FORMAT" }}</td>
+                <td>{{ maintenance.technician|default:"" }}</td>
+                <td>{{ maintenance.observation }}</td>
+                <td>{{ maintenance.id }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}
+
+{% block extra_javascript %}
+<script src="{% static 'js/jquery.mask.min.js' %}" crossorigin="anonymous"></script>
+<script>
+    $(function() {
+        $('#table').DataTable(
+            {
+                deferRender: true,
+                responsive: true,
+                order: [[1, 'asc']],
+                columns: [
+                    {data: 'boat'},
+                    {data: 'due_date',
+                        render: function(data, type, row) {
+                            const today = new Date().setHours(0,0,0,0);
+                            const dueDate = new Date(data + 'T00:00:00');
+                            if (dueDate < today) {
+                                return `<span class="text-danger">${dueDate.toLocaleDateString()}</span>`;
+                            } else if (dueDate > today) {
+                                return `<span class="text-success">${dueDate.toLocaleDateString()}</span>`
+                            } else {
+                                return `<span class="text-primary">${dueDate.toLocaleDateString()}</span>`;
+                            }
+                        }
+                    },
+                    {data: 'periodic',
+                        render: function(data, type, row) {
+                            return data == 'None' ? 'Não' : 'Sim';
+                        }
+                    },
+                    {data: 'sector'},
+                    {data: 'description'},
+                    {data: 'creator'},
+                    {data: 'schedule_date',
+                        render: function(data, type, row) {
+                            console.log(data)
+                            if (data !== '') {
+                                const today = new Date().setHours(0,0,0,0);
+                                const scheduleDate = new Date(data + 'T00:00:00');
+                                if (scheduleDate < today) {
+                                    return `<span class="text-danger">${scheduleDate.toLocaleDateString()}</span>`;
+                                } else if (scheduleDate > today) {
+                                    return `<span class="text-success">${scheduleDate.toLocaleDateString()}</span>`
+                                } else {
+                                    return `<span class="text-primary">${scheduleDate.toLocaleDateString()}</span>`;
+                                }
+                            }
+                            return data;
+                        }
+                    },
+                    {data: 'technician'},
+                    {data: 'observation'},
+                    {data: 'id',
+                        render: function(data, type, row) {
+                            return  `<div class="d-flex">
+                                    <button type="button" id="button-operation-${data}" class="btn btn-warning p-1 me-1 button-operation" title="operação">
+                                    <i class="bi bi-gear"></i></button>
+                                    <a href="update/${data}" class="btn btn-primary p-1 me-1" title="editar"
+                                    id="update-${data}"><i class="bi bi-pencil"></i></a>
+                                    <button type="button" id="button-delete-${data}" class="btn btn-danger p-1 me-2 button-delete" title="criar nova senha">
+                                    <i class="bi bi-trash"></i></button>
+                                    </div>`;
+                        }
+                    }
+                ],
+                columnDefs: [
+                    { responsivePriority: 1, targets: 0 },
+                    { responsivePriority: 2, targets: -1 },
+                    { orderable: false, targets: -1 },
+                    { width: "5%", targets:-1},
+                ],
+            }
+        );
+    });
+
+    $(document).on('click', '.button-operation', function() {
+        console.log('operação');
+        const maintenance_id = $(this).attr('id').split('-')[2];
+        const table_line = $(this).closest('tr');
+        const sector = table_line.find("td:eq(3)").text();
+        let due_date = table_line.find("td:eq(1)").text();
+        due_date = new Date(due_date.slice(6,10), parseInt(due_date.slice(3,5)) - 1, due_date.slice(0,2));
+        const has_schedule_date = table_line.find("td:eq(6)").text() != "";
+        const technicians = JSON.parse('{{ technicians|safe }}');
+        Swal.fire({
+            titleText: "Agendar Manutenção",
+            theme: '{{ request.user.get_theme_display }}',
+            buttonsStyling: false,
+            showCancelButton: true,
+            confirmButtonText: "agendar",
+            cancelButtonText: "cancelar",
+            customClass: {
+                confirmButton: 'btn btn-success btn-lg me-2',
+                cancelButton: 'btn btn-danger btn-lg',
+                loader: 'custom-loader',
+            },
+            loaderHtml: '<div class="spinner-border text-primary"></div>',
+            html:`
+            {% csrf_token %}
+            <div id="html_content"></div>
+            `,
+            willOpen: function() {
+                const html_content = $('#html_content');
+                let content = '';
+                if (has_schedule_date) {
+                    const title = Swal.getTitle();
+                    const confirm_button = Swal.getConfirmButton();
+                    title.textContent = 'Finalizar o serviço';
+                    confirm_button.textContent = 'finalizar';
+                    content = `
+                    <div class="form-floating mb-3">
+                        <input type="date" name="finish_date" class="form-control" id="id_finish_date">
+                        <label for="finish_date" class="form-label">data da finalização</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" name="cost_value" class="form-control" id="id_cost_value">
+                        <label for="cost_value" class="form-label">valor</label>
+                    </div>
+                    `
+                    if (sector == 'motor') {
+                        content += `<div class="form-floating mb-3">
+                                    <input type="number" name="engine_hours" class="form-control" id="id_engine_hours">
+                                    <label for="engine_hours" class="form-label">horímetro</label>
+                                </div>`
+                    }
+                } else {
+                    content = `
+                    <div class="form-floating mb-3">
+                        <select name="technician" class="form-select" placeholder="#" id="id_technician">
+                        ${technicians.map(technician => `<option value="${technician.id}">${technician.name}</option>`).join('')}
+                        </select>
+                        <label for="technician" class="form-label">técnico</label>
+                    </div>
+                    <div class="form-floating">
+                        <input type="date" name="schedule_date" class="form-control" id="id_schedule_date">
+                        <label for="schedule_date" class="form-label">data do agendamento</label>
+                    </div>
+                    `
+                }
+                html_content.html(content);
+            },
+            preConfirm: function() {
+                if (has_schedule_date) {
+                    let schedule_date = table_line.find("td:eq(6)").text();
+                    schedule_date = new Date(schedule_date.slice(6,10), parseInt(schedule_date.slice(3,5)) - 1, schedule_date.slice(0,2));
+                    const finish_date = $('#id_finish_date').val();
+                    const cost_value = $('#id_cost_value').cleanVal() / 100;
+                    const engine_hours = $('#id_engine_hours').val() ? $('#id_engine_hours').val() : null;
+                    console.log(cost_value)
+                    if (!finish_date || (sector == 'motor' && !engine_hours) || !cost_value) {
+                        Swal.showValidationMessage("Por favor, preencha todos os campos.");
+                        Swal.enableButtons();
+                        return false;
+                    }
+                    finish_date_check = finish_date + 'T03:00:00';
+                    finish_date_check = new Date(finish_date_check);
+                    if (finish_date_check < schedule_date) {
+                        Swal.showValidationMessage("A data da finalização não pode ser anterior à data do agendamento.");
+                        Swal.enableButtons();
+                        return false;
+                    }
+                    return { finish_date, engine_hours, cost_value };
+                } else {
+                    let schedule_date = $('#id_schedule_date').val();
+                    const technician = $('#id_technician').val();
+                    if (!schedule_date || !technician) {
+                        Swal.showValidationMessage("Por favor, preencha todos os campos.");
+                        Swal.enableButtons();
+                        return false;
+                    }
+                    schedule_date_check = schedule_date + 'T03:00:00';
+                    schedule_date_check = new Date(schedule_date_check);
+                    console.log(due_date)
+                    console.log(schedule_date_check)
+                    if (schedule_date_check < due_date) {
+                        Swal.showValidationMessage("A data do agendamento não pode ser anterior à data da manutenção.");
+                        Swal.enableButtons();
+                        return false;
+                    }
+                    return { schedule_date, technician };
+                }
+            },
+            didOpen: function() {
+                const value = $('#id_cost_value');
+                value.mask('000.000.000,00', { reverse: true });
+            },
+        }).then(function(result) {
+                if (result.isConfirmed) {
+                    const url = "{% url 'maintenance:flow-maintenance' %}";
+                    const body = {
+                        has_schedule: has_schedule_date,
+                        maintenance_id: maintenance_id,
+                        schedule_date: result.value.schedule_date,
+                        technician_id: result.value.technician,
+                        finish_date: result.value.finish_date,
+                        engine_hours: result.value.engine_hours,
+                        value: result.value.cost_value,
+                    }
+                    fetch(url, {
+                        method: "POST",
+                        body: JSON.stringify(body),
+                        headers: {
+                            "Content-type": "application/json; charset=UTF-8",
+                            "X-CSRFToken": "{{csrf_token}}"
+                        },
+                        credentials: 'same-origin',})
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'ok') {
+                            Toast.fire({
+                                icon: "success",
+                                title: data.message,
+                                background: "#B0FFB0",
+                            });
+                        } else {
+                            Toast.fire({
+                                icon: "error",
+                                title: data.message,
+                                background: "#FFB0B0",
+                            });
+                        }
+                        setTimeout(() => {
+                            if (has_schedule_date) {
+                                location.href = "{% url 'maintenance:table-finished-maintenances' %}"
+                            } else {
+                                location.reload();
+                            }
+                        }, 2000);
+                    })    
+                    .catch(error => console.error(error));
+                }
+        })
+    });
+
+    $(document).on('click', '.button-delete', function() {
+        const id = $(this).attr('id').split('-')[2];
+        const table_line = $(this).closest('tr');
+        const descricao = table_line.find("td:eq(2)").text();
+        Swal.fire({
+            title: "Você tem certeza?",
+            text: `você vai apagar a manutenção: ${descricao}`,
+            icon: "warning",
+            theme: '{{ request.user.get_theme_display }}',
+            buttonsStyling: false,
+            showCancelButton: true,
+            confirmButtonText: "apagar",
+            customClass: {
+                confirmButton: 'btn btn-success btn-lg me-2',
+                cancelButton: 'btn btn-danger btn-lg',
+                loader: 'custom-loader',
+            },
+            loaderHtml: '<div class="spinner-border text-primary"></div>',
+        })
+        .then((result) => {
+            if (result.isConfirmed) {
+                const url = "{% url 'maintenance:delete-maintenance' 1 %}".replace('1', id);
+                fetch(url, {method: "GET",})
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        Toast.fire({
+                            icon: "success",
+                            title: data.message,
+                            background: "#B0FFB0",
+                        });
+                        // Atualizar a lista de usuários após a exclusão
+                        table_line.remove();
+                    } else {
+                        Toast.fire({
+                            icon: "error",
+                            title: data.message,
+                            background: "#FFB0B0",
+                        });
+                    }
+                    }) 
+                .catch(error => console.error(error));
+            } 
+        });
+    })
+</script>
+{% endblock extra_javascript %}

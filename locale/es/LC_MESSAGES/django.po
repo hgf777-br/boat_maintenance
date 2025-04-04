@@ -1,0 +1,354 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-04-01 16:31-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
+
+#: .\boat\models.py:16 .\technician\models.py:16
+msgid "name"
+msgstr ""
+
+#: .\boat\models.py:17
+msgid "number of shares"
+msgstr ""
+
+#: .\boat\models.py:18
+msgid "manufacturer"
+msgstr ""
+
+#: .\boat\models.py:29 .\maintenance\models.py:40 .\maintenance\models.py:65
+#: .\technician\models.py:20 .\user\models.py:38
+msgid "created at"
+msgstr ""
+
+#: .\boat\models.py:30 .\maintenance\models.py:41 .\maintenance\models.py:66
+#: .\technician\models.py:21 .\user\models.py:39
+msgid "updated at"
+msgstr ""
+
+#: .\boat_maintenance\settings.py:175
+msgid "Portuguese"
+msgstr ""
+
+#: .\boat_maintenance\settings.py:176
+msgid "English"
+msgstr ""
+
+#: .\boat_maintenance\settings.py:177
+msgid "Spanish"
+msgstr ""
+
+#: .\maintenance\models.py:9
+msgid "engine"
+msgstr ""
+
+#: .\maintenance\models.py:10
+msgid "hydraulic"
+msgstr ""
+
+#: .\maintenance\models.py:11
+msgid "electric"
+msgstr ""
+
+#: .\maintenance\models.py:12
+msgid "equipment"
+msgstr ""
+
+#: .\maintenance\models.py:13
+msgid "cables"
+msgstr ""
+
+#: .\maintenance\models.py:14
+msgid "rigging"
+msgstr ""
+
+#: .\maintenance\models.py:15 .\technician\models.py:14
+msgid "other"
+msgstr ""
+
+#: .\maintenance\models.py:19
+msgid "weekly"
+msgstr ""
+
+#: .\maintenance\models.py:20
+msgid "bi-weekly"
+msgstr ""
+
+#: .\maintenance\models.py:21
+msgid "monthly"
+msgstr ""
+
+#: .\maintenance\models.py:22
+msgid "quarterly"
+msgstr ""
+
+#: .\maintenance\models.py:23
+msgid "semi-annually"
+msgstr ""
+
+#: .\maintenance\models.py:24
+msgid "annually"
+msgstr ""
+
+#: .\maintenance\models.py:29 .\maintenance\models.py:55
+msgid "description"
+msgstr ""
+
+#: .\maintenance\models.py:30
+msgid "due date"
+msgstr ""
+
+#: .\maintenance\models.py:31 .\maintenance\models.py:58
+msgid "sector"
+msgstr ""
+
+#: .\maintenance\models.py:32 .\maintenance\models.py:56
+msgid "creator"
+msgstr ""
+
+#: .\maintenance\models.py:33 .\maintenance\models.py:57
+msgid "boat"
+msgstr ""
+
+#: .\maintenance\models.py:34
+msgid "schedule date"
+msgstr ""
+
+#: .\maintenance\models.py:35
+msgid "technician"
+msgstr ""
+
+#: .\maintenance\models.py:36
+msgid "observation"
+msgstr ""
+
+#: .\maintenance\models.py:37
+msgid "finish date"
+msgstr ""
+
+#: .\maintenance\models.py:38
+msgid "completed"
+msgstr ""
+
+#: .\maintenance\models.py:39
+msgid "engine hours"
+msgstr ""
+
+#: .\maintenance\models.py:51
+msgid "Monday"
+msgstr ""
+
+#: .\maintenance\models.py:51
+msgid "Tuesday"
+msgstr ""
+
+#: .\maintenance\models.py:51
+msgid "Wednesday"
+msgstr ""
+
+#: .\maintenance\models.py:51
+msgid "Thursday"
+msgstr ""
+
+#: .\maintenance\models.py:51
+msgid "Friday"
+msgstr ""
+
+#: .\maintenance\models.py:51
+msgid "Saturday"
+msgstr ""
+
+#: .\maintenance\models.py:51
+msgid "Sunday"
+msgstr ""
+
+#: .\maintenance\models.py:52
+msgid "January"
+msgstr ""
+
+#: .\maintenance\models.py:52
+msgid "February"
+msgstr ""
+
+#: .\maintenance\models.py:52
+msgid "March"
+msgstr ""
+
+#: .\maintenance\models.py:52
+msgid "April"
+msgstr ""
+
+#: .\maintenance\models.py:52
+msgid "May"
+msgstr ""
+
+#: .\maintenance\models.py:52
+msgid "June"
+msgstr ""
+
+#: .\maintenance\models.py:53
+msgid "July"
+msgstr ""
+
+#: .\maintenance\models.py:53
+msgid "August"
+msgstr ""
+
+#: .\maintenance\models.py:53
+msgid "September"
+msgstr ""
+
+#: .\maintenance\models.py:53
+msgid "October"
+msgstr ""
+
+#: .\maintenance\models.py:53
+msgid "November"
+msgstr ""
+
+#: .\maintenance\models.py:53
+msgid "December"
+msgstr ""
+
+#: .\maintenance\models.py:59
+msgid "periodicity"
+msgstr ""
+
+#: .\maintenance\models.py:60
+msgid "day of month"
+msgstr ""
+
+#: .\maintenance\models.py:61
+msgid "month"
+msgstr ""
+
+#: .\maintenance\models.py:62
+msgid "day of week"
+msgstr ""
+
+#: .\maintenance\models.py:63
+msgid "periodicity value"
+msgstr ""
+
+#: .\maintenance\models.py:64
+msgid "last run date"
+msgstr ""
+
+#: .\technician\models.py:7
+msgid "mechanic"
+msgstr ""
+
+#: .\technician\models.py:8
+msgid "plumber"
+msgstr ""
+
+#: .\technician\models.py:9
+msgid "electrician"
+msgstr ""
+
+#: .\technician\models.py:10
+msgid "carpenter"
+msgstr ""
+
+#: .\technician\models.py:11
+msgid "painter"
+msgstr ""
+
+#: .\technician\models.py:12
+msgid "upholsterer"
+msgstr ""
+
+#: .\technician\models.py:13
+msgid "engineer"
+msgstr ""
+
+#: .\technician\models.py:17 .\user\models.py:36
+msgid "cell phone"
+msgstr ""
+
+#: .\technician\models.py:18
+msgid "email"
+msgstr ""
+
+#: .\technician\models.py:19
+msgid "speciality"
+msgstr ""
+
+#: .\user\managers.py:15
+msgid "The Username must be set"
+msgstr ""
+
+#: .\user\managers.py:17
+msgid "The Email must be set"
+msgstr ""
+
+#: .\user\managers.py:34
+msgid "Superuser must have is_staff=True."
+msgstr ""
+
+#: .\user\managers.py:36
+msgid "Superuser must have is_superuser=True."
+msgstr ""
+
+#: .\user\models.py:15
+msgid "share owner"
+msgstr ""
+
+#: .\user\models.py:16
+msgid "operator"
+msgstr ""
+
+#: .\user\models.py:17
+msgid "master"
+msgstr ""
+
+#: .\user\models.py:28
+msgid "profile"
+msgstr ""
+
+#: .\user\models.py:34
+msgid "theme"
+msgstr ""
+
+#: .\user\models.py:37
+msgid "email address"
+msgstr ""
+
+#: .\user\models.py:93
+msgid "address"
+msgstr ""
+
+#: .\user\models.py:94
+msgid "state"
+msgstr ""
+
+#: .\user\models.py:95
+msgid "city"
+msgstr ""
+
+#: .\user\models.py:96
+msgid "country"
+msgstr ""
+
+#: .\user\models.py:97
+msgid "zip code"
+msgstr ""
+
+#: .\user\models.py:98
+msgid "birth date"
+msgstr ""

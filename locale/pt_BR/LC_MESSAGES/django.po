@@ -1,0 +1,353 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-04-01 16:18-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: .\boat\models.py:16 .\technician\models.py:16
+msgid "name"
+msgstr "nome"
+
+#: .\boat\models.py:17
+msgid "number of shares"
+msgstr "número de cotas"
+
+#: .\boat\models.py:18
+msgid "manufacturer"
+msgstr "fabricante"
+
+#: .\boat\models.py:29 .\maintenance\models.py:40 .\maintenance\models.py:65
+#: .\technician\models.py:20 .\user\models.py:38
+msgid "created at"
+msgstr "criado em"
+
+#: .\boat\models.py:30 .\maintenance\models.py:41 .\maintenance\models.py:66
+#: .\technician\models.py:21 .\user\models.py:39
+msgid "updated at"
+msgstr "atualizado em"
+
+#: .\boat_maintenance\settings.py:175
+msgid "Portuguese"
+msgstr "Portugues"
+
+#: .\boat_maintenance\settings.py:176
+msgid "English"
+msgstr "Inglês"
+
+#: .\boat_maintenance\settings.py:177
+msgid "Spanish"
+msgstr "Espanhol"
+
+#: .\maintenance\models.py:9
+msgid "engine"
+msgstr "motor"
+
+#: .\maintenance\models.py:10
+msgid "hydraulic"
+msgstr "hidráulica"
+
+#: .\maintenance\models.py:11
+msgid "electric"
+msgstr "elétrica"
+
+#: .\maintenance\models.py:12
+msgid "equipment"
+msgstr "equipamento"
+
+#: .\maintenance\models.py:13
+msgid "cables"
+msgstr "cabos"
+
+#: .\maintenance\models.py:14
+msgid "rigging"
+msgstr "estaiamento"
+
+#: .\maintenance\models.py:15 .\technician\models.py:14
+msgid "other"
+msgstr "outro"
+
+#: .\maintenance\models.py:19
+msgid "weekly"
+msgstr "semanal"
+
+#: .\maintenance\models.py:20
+msgid "bi-weekly"
+msgstr "quinzenal"
+
+#: .\maintenance\models.py:21
+msgid "monthly"
+msgstr "mensal"
+
+#: .\maintenance\models.py:22
+msgid "quarterly"
+msgstr "trimestral"
+
+#: .\maintenance\models.py:23
+msgid "semi-annually"
+msgstr "semestral"
+
+#: .\maintenance\models.py:24
+msgid "annually"
+msgstr "anual"
+
+#: .\maintenance\models.py:29 .\maintenance\models.py:55
+msgid "description"
+msgstr "descrição"
+
+#: .\maintenance\models.py:30
+msgid "due date"
+msgstr "data limite"
+
+#: .\maintenance\models.py:31 .\maintenance\models.py:58
+msgid "sector"
+msgstr "setor"
+
+#: .\maintenance\models.py:32 .\maintenance\models.py:56
+msgid "creator"
+msgstr "criador"
+
+#: .\maintenance\models.py:33 .\maintenance\models.py:57
+msgid "boat"
+msgstr "barco"
+
+#: .\maintenance\models.py:34
+msgid "schedule date"
+msgstr "data agendamento"
+
+#: .\maintenance\models.py:35
+msgid "technician"
+msgstr "técnico"
+
+#: .\maintenance\models.py:36
+msgid "observation"
+msgstr "oservação"
+
+#: .\maintenance\models.py:37
+msgid "finish date"
+msgstr "data fnalização"
+
+#: .\maintenance\models.py:38
+msgid "completed"
+msgstr "completada"
+
+#: .\maintenance\models.py:39
+msgid "engine hours"
+msgstr "hora do motor"
+
+#: .\maintenance\models.py:51
+msgid "Monday"
+msgstr "segunda"
+
+#: .\maintenance\models.py:51
+msgid "Tuesday"
+msgstr "terça"
+
+#: .\maintenance\models.py:51
+msgid "Wednesday"
+msgstr "quarta"
+
+#: .\maintenance\models.py:51
+msgid "Thursday"
+msgstr "quinta"
+
+#: .\maintenance\models.py:51
+msgid "Friday"
+msgstr "sexta"
+
+#: .\maintenance\models.py:51
+msgid "Saturday"
+msgstr "sabado"
+
+#: .\maintenance\models.py:51
+msgid "Sunday"
+msgstr "domingo"
+
+#: .\maintenance\models.py:52
+msgid "January"
+msgstr "janeiro"
+
+#: .\maintenance\models.py:52
+msgid "February"
+msgstr "fevereiro"
+
+#: .\maintenance\models.py:52
+msgid "March"
+msgstr "março"
+
+#: .\maintenance\models.py:52
+msgid "April"
+msgstr "abri"
+
+#: .\maintenance\models.py:52
+msgid "May"
+msgstr "maio"
+
+#: .\maintenance\models.py:52
+msgid "June"
+msgstr "junho"
+
+#: .\maintenance\models.py:53
+msgid "July"
+msgstr "julho"
+
+#: .\maintenance\models.py:53
+msgid "August"
+msgstr "agosto"
+
+#: .\maintenance\models.py:53
+msgid "September"
+msgstr "setembro"
+
+#: .\maintenance\models.py:53
+msgid "October"
+msgstr "outubro"
+
+#: .\maintenance\models.py:53
+msgid "November"
+msgstr "novembro"
+
+#: .\maintenance\models.py:53
+msgid "December"
+msgstr "dezembro"
+
+#: .\maintenance\models.py:59
+msgid "periodicity"
+msgstr "periodicidade"
+
+#: .\maintenance\models.py:60
+msgid "day of month"
+msgstr "dia do mês"
+
+#: .\maintenance\models.py:61
+msgid "month"
+msgstr "mês"
+
+#: .\maintenance\models.py:62
+msgid "day of week"
+msgstr "dia da semana"
+
+#: .\maintenance\models.py:63
+msgid "periodicity value"
+msgstr "valor da periodicidade"
+
+#: .\maintenance\models.py:64
+msgid "last run date"
+msgstr "data da última execução"
+
+#: .\technician\models.py:7
+msgid "mechanic"
+msgstr "mecânico"
+
+#: .\technician\models.py:8
+msgid "plumber"
+msgstr "encanador"
+
+#: .\technician\models.py:9
+msgid "electrician"
+msgstr "eletricista"
+
+#: .\technician\models.py:10
+msgid "carpenter"
+msgstr "carpinteiro"
+
+#: .\technician\models.py:11
+msgid "painter"
+msgstr "pintor"
+
+#: .\technician\models.py:12
+msgid "upholsterer"
+msgstr "tapeceiro"
+
+#: .\technician\models.py:13
+msgid "engineer"
+msgstr "engenheiro"
+
+#: .\technician\models.py:17 .\user\models.py:36
+msgid "cell phone"
+msgstr "celular"
+
+#: .\technician\models.py:18
+msgid "email"
+msgstr "email"
+
+#: .\technician\models.py:19
+msgid "speciality"
+msgstr "especialidade"
+
+#: .\user\managers.py:15
+msgid "The Username must be set"
+msgstr "O nome de usuário é obrigatório"
+
+#: .\user\managers.py:17
+msgid "The Email must be set"
+msgstr "O email é obrigatório"
+
+#: .\user\managers.py:34
+msgid "Superuser must have is_staff=True."
+msgstr ""
+
+#: .\user\managers.py:36
+msgid "Superuser must have is_superuser=True."
+msgstr ""
+
+#: .\user\models.py:15
+msgid "share owner"
+msgstr "cotista"
+
+#: .\user\models.py:16
+msgid "operator"
+msgstr "operador"
+
+#: .\user\models.py:17
+msgid "master"
+msgstr "master"
+
+#: .\user\models.py:28
+msgid "profile"
+msgstr "perfil"
+
+#: .\user\models.py:34
+msgid "theme"
+msgstr "tema"
+
+#: .\user\models.py:37
+msgid "email address"
+msgstr "email"
+
+#: .\user\models.py:93
+msgid "address"
+msgstr "endereço"
+
+#: .\user\models.py:94
+msgid "state"
+msgstr "estado"
+
+#: .\user\models.py:95
+msgid "city"
+msgstr "cidade"
+
+#: .\user\models.py:96
+msgid "country"
+msgstr "país"
+
+#: .\user\models.py:97
+msgid "zip code"
+msgstr "cep"
+
+#: .\user\models.py:98
+msgid "birth date"
+msgstr "data de nascimento"

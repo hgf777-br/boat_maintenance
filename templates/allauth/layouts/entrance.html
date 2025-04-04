@@ -1,0 +1,36 @@
+{% extends "allauth/layouts/base.html" %}
+{% load allauth %}
+{% load static %}
+{% block extra_css %}
+    <style>
+        .login-form {
+            max-width: 330px;
+            padding: 1rem;
+        }
+    </style>
+{% endblock extra_css %}
+{% block body %}
+<main class="login-form w-100 m-auto mt-4">
+    {% setvar src_logo %}
+        {% static 'images/logo_blue_note.png' %}
+    {% endsetvar %}
+    <div class="px-5">
+        {% element img src=src_logo %}{% endelement %}
+    </div>
+    {% block content %}{% endblock %}
+</main>
+{% endblock body %}
+{% block extra_body %}
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}" crossorigin="anonymous"></script>
+    <script>
+        (() => {
+            document.getElementById('id_login').focus();
+            toggleButton = document.getElementById('toggle-password');
+            toggleButton.addEventListener('click', function() {
+                var passwordInput = document.getElementById('id_password');
+                passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+                toggleButton.innerHTML = passwordInput.type === 'password' ? '<img src="../../../static/images/bs_icons/eye-fill.svg"/>' : '<img src="../../../static/images/bs_icons/eye-slash-fill.svg"/>' ;
+            });
+        })()
+    </script>
+{% endblock extra_body %}

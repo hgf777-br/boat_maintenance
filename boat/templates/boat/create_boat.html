@@ -1,0 +1,58 @@
+{% extends "partials/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col">
+        <h3>Novo Barco</h3>
+        <hr>
+    </div>
+</div>
+<form method="POST" class="needs-validation" novalidate>
+    {% csrf_token %}
+    <div class="row mb-4 g-2">
+        <div class="col-md-6">
+            <div class="form-floating">
+                {{ form.name }}
+                <label for="name" class="form-label">{{ form.name.label }}</label>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-floating">
+                {{ form.manufacturer }}
+                <label for="manufacturer" class="form-label">{{ form.manufacturer.label }}</label>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4 g-2">
+        <div class="col-md-6">
+            <div class="form-floating">
+                {{ form.model }}
+                <label for="model" class="form-label">{{ form.model.label }}</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.year_built }}
+                <label for="year_built" class="form-label">{{ form.year_built.label }}</label>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-floating">
+                {{ form.number_shares }}
+                <label for="number_shares" class="form-label">{{ form.number_shares.label }}</label>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col">
+            <div class="float-end mb-3 me-2">
+                <button type="submit" class="btn btn-outline-success">Cadastrar</button>
+                <a href="{% url 'boat:table-boats' %}" class="btn btn-outline-danger ms-2">Cancelar</a>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock content %}

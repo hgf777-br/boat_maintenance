@@ -1,0 +1,146 @@
+{% load i18n %}
+{% load static %}
+<header class="d-flex flex-wrap justify-content-center py-3 mb-2 border-bottom">
+    <a href="users/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+        <img src="{% static 'images/logo_blue_note_org.png' %}" width="80px"/>
+    </a>
+
+    <ul class="nav">
+        <li class="nav-item"><a href="#" class="nav-link">ocorrência</a></li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">manutenção</a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'maintenance:table-pending-maintenances' %}">pendentes</a></li>
+                <li><a class="dropdown-item" href="{% url 'maintenance:table-finished-maintenances' %}">finalizadas</a></li>
+                <li><a class="dropdown-item" href="{% url 'maintenance:table-periodics' %}">periódicas</a></li>
+            </ul>
+        </li>
+        {% if request.user.profile != "SO" %}
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">cadastro</a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'user:table-users' %}">usuários</a></li>
+                <li><a class="dropdown-item" href="{% url 'technician:table-technicians' %}">técnicos</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'boat:table-boats' %}">barcos</a></li>
+            </ul>
+        </li>
+        {% endif %}
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle"  data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">{{ request.user }}</a>
+            <ul class="dropdown-menu">
+                <li><h6 class="dropdown-header">{{ request.user.get_profile_display }}</h6></li>
+                <li>
+                    <a class="dropdown-item" href="{% url 'user:update-user' request.user.pk %}"><i class="bi bi-person-badge me-2"></i>editar perfil</a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="#" id="button-change-password"><i class="bi bi-key me-2"></i>trocar senha</a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item" href="/accounts/logout/"><i class="bi bi-box-arrow-in-right me-2"></i>sair</a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</header>
+<script>
+    // Change Password Button Event Listener in the Header Menu
+    document.getElementById('button-change-password').addEventListener('click', function() {
+        Swal.fire({
+            title: 'Trocar a Senha',
+            theme: '{{ request.user.get_theme_display }}',
+            buttonsStyling: false,
+            showCancelButton: true,
+            confirmButtonText: "trocar",
+            cancelButtonText: "cancelar",
+            customClass: {
+                confirmButton: 'btn btn-success btn-lg me-2',
+                cancelButton: 'btn btn-danger btn-lg',
+            },
+            html:`
+            <div class="form-floating">
+                <input type="password" id="actual-password" class="form-control" placeholder="#">
+                <label>Senha atual</label>
+            </div>
+            <hr>
+            <div class="form-floating mb-2">
+                <input type="password" id="new-password" class="form-control" placeholder="#">
+                <label>Nova senha</label>
+            </div>
+            <div>
+                <h5>Mínimo de 8 caracteres, somente letras e números</h5>
+            </div>
+            <div class="form-floating">
+                <input type="password" id="new-password-confirm" class="form-control" placeholder="#">
+                <label>Confirme a nova senha</label>
+            </div>
+            `,
+            preConfirm: function () {
+                return new Promise(function (resolve) {
+                    const actual_password = document.getElementById('actual-password').value;
+                    const new_password = document.getElementById('new-password').value;
+                    const new_password_confirm = document.getElementById('new-password-confirm').value;
+                    const pattern = /^\w{8,}$/;
+                    if (actual_password == '' || new_password == '' || new_password_confirm == '') {
+                        Swal.showValidationMessage("Você precisa preencher todos os campos"); // Show error when validation fails.
+                        Swal.enableButtons(); // Enable the confirm button again.
+                    } else if (new_password !== new_password_confirm) {
+                        Swal.showValidationMessage("As novas senhas não coincidem"); // Show error when validation fails.
+                        Swal.enableButtons(); // Enable the confirm button again.
+                    } else if (!pattern.test(new_password)) {
+                        Swal.showValidationMessage("A nova senha não segue as regras."); // Show error when validation fails.
+                        Swal.enableButtons(); // Enable the confirm button again.
+                    } else {
+                        resolve([
+                            actual_password,
+                            new_password,
+                            new_password_confirm
+                        ])
+                    }
+                })
+            },
+            didOpen: function () {
+                document.getElementById('actual-password').focus();
+            }
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                const url = "{% url 'user:change-password-user' %}";
+                const user_id = "{{ request.user.id }}";
+                fetch(url, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        user_id: user_id,
+                        actual_password: result.value[0],
+                        new_password: result.value[1],
+                        new_password_confirm: result.value[2],
+                    }),
+                    headers: {
+                        "Content-type": "application/json; charset=UTF-8",
+                        "X-CSRFToken": "{{csrf_token}}"
+                    },
+                    credentials: 'same-origin',})
+                .then(response => response.json())  
+                .then(data => {
+                    if (data.status === 'ok') {
+                        Toast.fire({
+                            icon: "success",
+                            title: data.message,
+                            background: "#B0FFB0",
+                        });
+                    } else {
+                        Toast.fire({
+                            icon: "error",
+                            title: data.message,
+                            background: "#FFB0B0",
+                        });
+                    }
+                    // location.reload();
+                })    
+                .catch(error => console.error(error));
+            }
+        }).catch(function(event) {
+            console.log(`erro na troca de senha: ${event}`);
+        });
+    });
+</script>

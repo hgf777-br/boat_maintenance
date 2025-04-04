@@ -1,0 +1,112 @@
+{% extends "partials/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load boat_extras %}
+{% block extra_css%}
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/css/datepicker.min.css'>   
+{% endblock extra_css%}
+
+{% block content %}
+<form method="POST" class="needs-validation" novalidate>
+    {% csrf_token %}
+    <div class="row mb-2 g-2 align-items-end">
+        <div class="col-md-8">
+            <h3 class="align-bottom">Nova Manutenção</h3>
+        </div>
+        {% if request.user.profile != "SO" %}
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.boat }}
+                <label for="boat" class="form-label">{{ form.boat.label }}</label>
+            </div>
+        </div>
+        {% else %}
+        <input class="d-none" name="boat" id="id_boat" value="{{ request.user|boat }}" >
+        {% endif %}
+    </div>
+    <hr>
+    <div class="row mb-4 g-2">
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.due_date }}
+                <label for="due_date" class="form-label">{{ form.due_date.label }}</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.sector }}
+                <label for="sector" class="form-label">{{ form.sector.label }}</label>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4 g-2">
+        <div class="col">
+            <div class="form-floating">
+                {{ form.description }}
+                <label for="description" class="form-label">{{ form.description.label }}</label>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4 g-2">
+        <div class="col">
+            <div class="form-floating">
+                {{ form.observation }}
+                <label for="observation" class="form-label">{{ form.observation.label }}</label>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col">
+            <div class="float-end mb-3 me-2">
+                <button type="submit" class="btn btn-outline-success">Cadastrar</button>
+                <a href="{% url 'maintenance:table-pending-maintenances' %}" class="btn btn-outline-danger ms-2">Cancelar</a>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock content %}
+
+{% block extra_javascript %}
+<script src='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/js/datepicker-full.min.js'></script>
+<script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/js/locales/pt-BR.js"></script>
+{% comment %} <script src="{% static 'js/datepicker.min.js' %}"></script> {% endcomment %}
+<script>
+    function change_validity(element, validity) {
+        if (!validity) {
+            element.classList.add('is-invalid');
+            element.setCustomValidity("Invalid field.");
+        } else {
+            element.classList.remove('is-invalid');
+            element.setCustomValidity("");
+        }
+    }
+
+    (() => {
+        'use strict'
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll('.needs-validation')
+        const due_date = document.getElementById('id_due_date');
+        const date_picker = new Datepicker(due_date, {
+            'format': 'dd/mm/yyyy', // BR format
+            'language': 'pt-BR', // PT-BR language
+            'todayButton': true,
+            'todayHighlight': true, // Highlight today's date
+            'autohide': true, // Automatically close the datepicker
+        });
+        
+        // Loop over them and prevent submission
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    console.log('erro')
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false)
+        })
+
+    })()
+</script>
+{% endblock extra_javascript %}
