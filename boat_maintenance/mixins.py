@@ -1,9 +1,9 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import AccessMixin
 
-class UserNotShareOwner(LoginRequiredMixin):
-    """Verify that the current user is not a Share Owner."""
+class UserNotShareOwner(AccessMixin):
+    """Verify that the current user is authenticated and not a Share Owner."""
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.profile == "SO":
+        if not request.user.is_authenticated and request.user.profile == "SO":
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)

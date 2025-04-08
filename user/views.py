@@ -80,4 +80,5 @@ class UserSendNewPasswordView(UserNotShareOwner, View):
         except ObjectDoesNotExist:
             return JsonResponse({"status": "error","message": "Usuário não encontrado"})
         except Exception as e:
+            print(e)
             return JsonResponse({"status": "error", "message": str(e)})

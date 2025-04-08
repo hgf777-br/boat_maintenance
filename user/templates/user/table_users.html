@@ -92,24 +92,44 @@
         console.log('enviar email com nova senha')
         const id = $(this).attr('id').split('-')[2];
         const url = "{% url 'user:send-new-password-user' 1 %}".replace('1', id);
-        fetch(url, {method: "GET",})
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'ok') {
-                Toast.fire({
-                    icon: "success",
-                    title: data.message,
-                    background: "#B0FFB0",
-                });
-            } else {
-                Toast.fire({
-                    icon: "error",
-                    title: data.message,
-                    background: "#FFB0B0",
-                });
+        Swal.fire({
+            title: "Criar Nova Senha",
+            text: "Enviaremos um email com uma nova senha para o usuário.",
+            icon: "info",
+            theme: '{{ request.user.get_theme_display }}',
+            showCancelButton: true,
+            confirmButtonText: "enviar",
+            cancelButtonText: "cancelar",
+            customClass: {
+                confirmButton: 'btn btn-success btn-lg me-2',
+                cancelButton: 'btn btn-danger btn-lg',
+                loader: 'custom-loader',
+            },
+            loaderHtml: '<div class="spinner-border text-primary"></div>',
+        })
+        .then(result => {
+                if (result.isConfirmed) {
+                    fetch(url, {method: "GET",})
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'ok') {
+                            Toast.fire({
+                                icon: "success",
+                                title: data.message,
+                                background: "#B0FFB0",
+                            });
+                        } else {
+                            Toast.fire({
+                                icon: "error",
+                                title: data.message,
+                                background: "#FFB0B0",
+                            });
+                        }
+                    }) 
+                    .catch(error => console.error(error));
+                }
             }
-            }) 
-        .catch(error => console.error(error));
+        )
     });
 
     $(document).on('click', '.button-delete', function() {

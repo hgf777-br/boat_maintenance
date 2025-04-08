@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'allauth',
     'allauth.account',
+    'django_crontab',
     # 'allauth.socialaccount',
     # 'allauth.socialaccount.providers.apple',
     # 'allauth.socialaccount.providers.google',
@@ -69,6 +70,7 @@ INSTALLED_APPS = [
     'boat',
     'technician',
     'maintenance',
+    'occurrence',
 ]
 
 MIDDLEWARE = [
@@ -110,7 +112,7 @@ EMAIL_PORT = os.getenv("EMAIL_PORT", "25")
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True")
-EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False")
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 
 # Email para o envio de menssagens
 SYSTEM_EMAIL = "hgf777@gmail.com"
@@ -199,3 +201,8 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_ON_GET = False
 ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = False
+
+CRONTAB_COMMAND_SUFFIX = '2>&1'
+CRONJOBS = [
+    ('*/2 * * * *', 'maintenance.cron.send_email_for_maintenances', '>> /var/log/cron.log'),
+]

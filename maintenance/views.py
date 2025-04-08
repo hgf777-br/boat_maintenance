@@ -2,12 +2,14 @@ from datetime import datetime, timedelta
 import json
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import ListView, View
+from django.views.generic import ListView, View, DetailView
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import CreateView, UpdateView
 from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import serializers
+from rest_framework.response import Response
 
 from .models import Maintenance, Periodic
 from .forms import MaintenanceForm, PeriodicForm
@@ -113,7 +115,6 @@ class MaintenanceFlowView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         try:
             data = json.loads(request.body)
-            print(data)
             maintenance = Maintenance.objects.get(pk=data['maintenance_id'])
             if data['has_schedule']:
                 finish_date = datetime.strptime(data['finish_date'], r'%Y-%m-%d')
@@ -121,6 +122,16 @@ class MaintenanceFlowView(LoginRequiredMixin, View):
                 maintenance.engine_hours = int(data['engine_hours']) if data['engine_hours'] else None
                 maintenance.value = float(data['value']) if data['value'] else None
                 maintenance.completed = True
+                if maintenance.periodic:
+                    new_maintenance = Maintenance(
+                        boat=maintenance.periodic.boat,
+                        due_date=maintenance.periodic.new_due_date(base_date=maintenance.due_date),
+                        sector=maintenance.periodic.sector,
+                        description=maintenance.periodic.description,
+                        creator=maintenance.periodic.creator,
+                        periodic=maintenance.periodic,
+                    )
+                    new_maintenance.save()
             else:
                 schedule_date = datetime.strptime(data['schedule_date'], r'%Y-%m-%d')
                 technician = Technician.objects.get(pk=data['technician_id'])
@@ -132,7 +143,29 @@ class MaintenanceFlowView(LoginRequiredMixin, View):
             return JsonResponse({'status': 'error','message': 'Manutenção ou técnico não encontrados'})
         except Exception as e:
             return JsonResponse({'status': 'error','message': str(e)})
+
+
+class MaintenanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Maintenance
+        fields = '__all__'
         
+    def to_representation(self, instance):
+        instance.due_date = instance.due_date.strftime(r'%d/%m/%Y')
+        instance.sector = instance.get_sector_display()
+        instance.schedule_date = instance.schedule_date.strftime(r'%d/%m/%Y') if instance.schedule_date else 'não agendada'
+        instance.finish_date = instance.finish_date.strftime(r'%d/%m/%Y') if instance.finish_date else 'não concluída'
+        ret = super().to_representation(instance)
+        ret['boat'] = instance.boat.name
+        ret['technician'] = instance.technician.name
+        print(ret)
+        return ret
+
+class MaintenanceDetailsView(LoginRequiredMixin, View):
+    def get(self, request, pk, *args, **kwargs):
+        maintenance = Maintenance.objects.get(pk=pk)
+        serialized_data = MaintenanceSerializer(maintenance)
+        return JsonResponse(serialized_data.data)
 
 class PeriodicsTableView(LoginRequiredMixin, ListView):
     model=Periodic
@@ -157,29 +190,7 @@ class PeriodicCreateView(LoginRequiredMixin, CreateView):
         periodic = form.save(commit=False)
         periodic.creator = self.request.user
         periodic.save()
-        today = datetime.today()
-        month = today.month
-        year = today.year
-        match periodic.periodicity:
-            case 'MO':
-                if today.day >= periodic.periodicity_day:
-                    month = month + 1 if month < 12 else 1
-                due_date = datetime(year, month, periodic.periodicity_day)
-            case 'WE'|'BW':
-                weekday_number = periodic.periodicity_week_day - 1
-                if today.weekday() >= weekday_number:
-                    day_difference = 7 - abs(today.weekday() - weekday_number)
-                    due_date = today + timedelta(days=day_difference)
-                else:
-                    day_difference = periodic.periodicity_week_day - today.weekday() - 1
-                    due_date = today + timedelta(days=day_difference)
-                if periodic.periodicity == 'BW':
-                    due_date += timedelta(days=7)
-            case 'QU'|'SA'|'AN':
-                    if month >= periodic.periodicity_month:
-                        year += 1
-                    due_date = datetime(year, periodic.periodicity_month, periodic.periodicity_day)
-            
+        due_date = periodic.new_due_date(initial_run=True)
         maintenance = Maintenance(
             boat=periodic.boat,
             due_date=due_date,
@@ -215,3 +226,24 @@ class PeriodicDeleteView(LoginRequiredMixin, View):
         except Exception as e:
             return JsonResponse({"status": "error","message": str(e)})
 
+
+class PeriodicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Periodic
+        fields = '__all__'
+        
+    def to_representation(self, instance):
+        instance.sector = instance.get_sector_display()
+        instance.periodicity_week_day = instance.get_periodicity_week_day_display()
+        instance.periodicity_month = instance.get_periodicity_month_display()
+        ret = super().to_representation(instance)
+        ret['boat'] = instance.boat.name
+        ret['periodicity_display'] = instance.get_periodicity_display()
+        print(ret)
+        return ret
+
+class PeriodicDetailsView(LoginRequiredMixin, View):
+    def get(self, request, pk, *args, **kwargs):
+        periodic = Periodic.objects.get(pk=pk)
+        serialized_data = PeriodicSerializer(periodic)
+        return JsonResponse(serialized_data.data)

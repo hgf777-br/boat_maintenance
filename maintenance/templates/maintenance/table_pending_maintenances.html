@@ -39,11 +39,11 @@
             <tr>
                 <td>{{ maintenance.boat }}</td>
                 <td>{{ maintenance.due_date|date:"Y-m-d" }}</td>
-                <td>{{ maintenance.periodic }}</td>
+                <td>{{ maintenance.periodic.get_periodicity_display }}</td>
                 <td>{{ maintenance.get_sector_display }}</td>
                 <td>{{ maintenance.description }}</td>
                 <td>{{ maintenance.creator }}</td>
-                <td>{{ maintenance.schedule_date|date:"SHORT_DATE_FORMAT" }}</td>
+                <td>{{ maintenance.schedule_date|date:"Y-m-d" }}</td>
                 <td>{{ maintenance.technician|default:"" }}</td>
                 <td>{{ maintenance.observation }}</td>
                 <td>{{ maintenance.id }}</td>
@@ -68,18 +68,21 @@
                         render: function(data, type, row) {
                             const today = new Date().setHours(0,0,0,0);
                             const dueDate = new Date(data + 'T00:00:00');
-                            if (dueDate < today) {
-                                return `<span class="text-danger">${dueDate.toLocaleDateString()}</span>`;
-                            } else if (dueDate > today) {
-                                return `<span class="text-success">${dueDate.toLocaleDateString()}</span>`
-                            } else {
-                                return `<span class="text-primary">${dueDate.toLocaleDateString()}</span>`;
+                            if (type == 'display' || type == 'filter') {
+                                if (dueDate < today) {
+                                    return `<span class="text-danger">${dueDate.toLocaleDateString()}</span>`;
+                                } else if (dueDate > today) {
+                                    return `<span class="text-success">${dueDate.toLocaleDateString()}</span>`
+                                } else {
+                                    return `<span class="text-primary">${dueDate.toLocaleDateString()}</span>`;
+                                }
                             }
+                            return data;
                         }
                     },
                     {data: 'periodic',
                         render: function(data, type, row) {
-                            return data == 'None' ? 'Não' : 'Sim';
+                            return data == '' ? 'não' : data;
                         }
                     },
                     {data: 'sector'},
@@ -87,17 +90,20 @@
                     {data: 'creator'},
                     {data: 'schedule_date',
                         render: function(data, type, row) {
-                            console.log(data)
                             if (data !== '') {
                                 const today = new Date().setHours(0,0,0,0);
+                                const dueDate = new Date(row.due_date + 'T00:00:00');
                                 const scheduleDate = new Date(data + 'T00:00:00');
-                                if (scheduleDate < today) {
-                                    return `<span class="text-danger">${scheduleDate.toLocaleDateString()}</span>`;
-                                } else if (scheduleDate > today) {
-                                    return `<span class="text-success">${scheduleDate.toLocaleDateString()}</span>`
-                                } else {
-                                    return `<span class="text-primary">${scheduleDate.toLocaleDateString()}</span>`;
+                                if (type == 'display' || type == 'filter') {
+                                    if (scheduleDate < today) {
+                                        return `<span class="text-danger">${scheduleDate.toLocaleDateString()}</span>`;
+                                    } else if (scheduleDate > today) {
+                                        return `<span class="text-success">${scheduleDate.toLocaleDateString()}</span>`
+                                    } else {
+                                        return `<span class="text-primary">${scheduleDate.toLocaleDateString()}</span>`;
+                                    }
                                 }
+                                return data;
                             }
                             return data;
                         }
@@ -222,15 +228,6 @@
                         Swal.enableButtons();
                         return false;
                     }
-                    schedule_date_check = schedule_date + 'T03:00:00';
-                    schedule_date_check = new Date(schedule_date_check);
-                    console.log(due_date)
-                    console.log(schedule_date_check)
-                    if (schedule_date_check < due_date) {
-                        Swal.showValidationMessage("A data do agendamento não pode ser anterior à data da manutenção.");
-                        Swal.enableButtons();
-                        return false;
-                    }
                     return { schedule_date, technician };
                 }
             },
@@ -274,7 +271,7 @@
                             });
                         }
                         setTimeout(() => {
-                            if (has_schedule_date) {
+                            if (has_schedule_date && data.status === 'ok') {
                                 location.href = "{% url 'maintenance:table-finished-maintenances' %}"
                             } else {
                                 location.reload();

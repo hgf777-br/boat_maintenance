@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -38,7 +39,7 @@ class Maintenance(models.Model):
     completed = models.BooleanField(default=False, verbose_name=_("completed"))
     engine_hours = models.PositiveIntegerField(verbose_name=_("engine hours"), blank=True, null=True)
     value = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_("value"), blank=True, null=True)
-    periodic = models.OneToOneField("Periodic", on_delete=models.CASCADE, verbose_name=_("periodic"), blank=True, null=True)
+    periodic = models.ForeignKey("Periodic", on_delete=models.CASCADE, verbose_name=_("periodic"), blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("created at"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("updated at"))
 
@@ -70,3 +71,38 @@ class Periodic(models.Model):
     def __str__(self):
         return self.description
     
+    def new_due_date(self, base_date=datetime.today(), initial_run=False):
+        month = base_date.month
+        year = base_date.year
+        match self.periodicity:
+            case 'MO':
+                if base_date.day >= self.periodicity_day or not initial_run:
+                    month = month + 1 if month < 12 else 1
+                due_date = datetime(year, month, self.periodicity_day)
+            case 'WE'|'BW':
+                if initial_run:
+                    weekday_number = self.periodicity_week_day - 1
+                    if base_date.weekday() >= weekday_number:
+                        day_difference = 7 - abs(base_date.weekday() - weekday_number)
+                    else:
+                        day_difference = self.periodicity_week_day - base_date.weekday() - 1
+                    due_date = base_date + timedelta(days=day_difference)
+                    if self.periodicity == 'BW':
+                        due_date += timedelta(days=7)
+                else:
+                    increase = 7 if self.periodicity == 'WE' else 14
+                    due_date = base_date + timedelta(days=increase)
+            case 'QU'|'SA'|'AN':
+                    if initial_run:
+                        if month >= self.periodicity_month:
+                            year += 1
+                        due_date = datetime(year, self.periodicity_month, self.periodicity_day)
+                    else:
+                        months = {'QU': 3, 'SA': 6, 'AN': 12}
+                        month += months[self.periodicity]
+                        if month > 12:
+                            month -= 12
+                            year += 1
+                        due_date = datetime(year, month, self.periodicity_day)
+        
+        return due_date

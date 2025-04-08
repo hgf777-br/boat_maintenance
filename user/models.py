@@ -1,7 +1,9 @@
+from pathlib import Path
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from django.conf import settings
-from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
 
 from boat.models import Boat
@@ -49,27 +51,17 @@ class User(AbstractUser):
         current_site = request.build_absolute_uri("/")[:-1]
         self.set_password(new_password)
         self.save()
-        subject = "Nova senha para o sistema NGO"
-        message = f"""
-        Olá {self.first_name},
-
-        Foi solicitada uma nova senha para o seu usuário.
-        Segue abaixo a senha gerada para seu acesso ao sistema:
-
-        usuário: {self.username}
-        senha provisória: {new_password}
-
-        Por favor faça o login no sistema abaixo
-
-        {current_site}
-
-        usando seu usuário, ou o seu email, e a senha enviada.
-
-        Pedimos que altere a senha para uma pessoal de sua escolha assim que possível.
-
-        Henrique Faria
-        """
-        self.email_user(subject, message, settings.SYSTEM_EMAIL)
+        context = {
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "username": self.username,
+            "new_password": new_password,
+            "current_site": current_site,
+        }
+        subject = "Nova senha para o sistema manuteção de embarcações"
+        html_message = render_to_string("email/new_user_password.html", context)
+        plain_message = strip_tags(html_message)
+        self.email_user(subject, plain_message, settings.SYSTEM_EMAIL, html_message=html_message)
         
     def get_boat(self):
         boats = Boat.objects.all()

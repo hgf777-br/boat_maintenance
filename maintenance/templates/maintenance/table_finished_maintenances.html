@@ -25,8 +25,6 @@
                 <th scope="col">descrição</th>
                 <th scope="col">responsável</th>
                 <th scope="col">tecnico</th>
-                <th scope="col">hora do motor</th>
-                <th scope="col">observações</th>
                 <th scope="col"></th>
             </tr>
         </thead>
@@ -34,13 +32,11 @@
             {% for maintenance in maintenances_list %}
             <tr>
                 <td>{{ maintenance.boat }}</td>
-                <td>{{ maintenance.finish_date|date:"SHORT_DATE_FORMAT" }}</td>
+                <td>{{ maintenance.finish_date|date:"Y-m-d" }}</td>
                 <td>{{ maintenance.get_sector_display }}</td>
                 <td>{{ maintenance.description }}</td>
                 <td>{{ maintenance.creator }}</td>
                 <td>{{ maintenance.technician|default:"" }}</td>
-                <td>{{ maintenance.engine_hours|default:"" }}</td>
-                <td>{{ maintenance.observation }}</td>
                 <td>{{ maintenance.id }}</td>
             </tr>
             {% endfor %}
@@ -69,6 +65,16 @@
                                             </div>`;
                                 }
                     },
+                    { targets: 1,
+                        render: function(data, type, row) {
+                            const finishedDate = new Date(data + 'T00:00:00');
+                            if (type == 'display' || type == 'filter') {
+                                return finishedDate.toLocaleDateString();
+                            }
+                            return data;
+                        }
+                    },
+                    {targets: "_all", className: "dt-left"},
                 ],
             }
         );
@@ -76,19 +82,34 @@
 
     $(document).on('click', '.button-info', function() {
         const id = $(this).attr('id').split('-')[2];
-        const table_line = $(this).closest('tr');
-        const descricao = table_line.find("td:eq(2)").text();
-        Swal.fire({
-            title: "Informação",
-            text: `informação da manutenção`,
-            theme: '{{ request.user.get_theme_display }}',
-            buttonsStyling: false,
-            showCancelButton: true,
-            customClass: {
-                cancelButton: 'btn btn-danger btn-lg',
-                loader: 'custom-loader',
-            },
-            loaderHtml: '<div class="spinner-border text-primary"></div>',
+        const url = "{% url 'maintenance:details-maintenance' 1 %}".replace('1', id);
+        fetch(url)
+        .then(response => response.json())  
+        .then(data => {
+            console.log(data)
+            Swal.fire({
+                title: "Informação",
+                html: `
+                <div class="text-start">
+                    <h5>descrição: ${data.description}</h5>
+                    <h5>data limite: ${data.due_date}</h5>
+                    <h5>setor: ${data.sector}</h5>
+                    <h5>barco: ${data.boat}</h5>
+                    <h5>data agendada: ${data.schedule_date}</h5>
+                    <h5>técnico: ${data.technician}</h5>
+                    <h5>data finalizada: ${data.finish_date}</h5>
+                    <h5>horas do motor: ${data.engine_hours}</h5>
+                    <h5>observação: ${data.observation}</h5>
+                </div>
+                `,
+                theme: '{{ request.user.get_theme_display }}',
+                buttonsStyling: false,
+                customClass: {
+                    confirmButton: 'btn btn-success btn',
+                    loader: 'custom-loader',
+                },
+                loaderHtml: '<div class="spinner-border text-primary"></div>',
+            });
         });
     })
 </script>
