@@ -36,15 +36,19 @@ class BoatCreateView(LoginRequiredMixin, CreateView):
     form_class = BoatForm
     success_url = reverse_lazy("boat:table-boats")
 
-    def form_valid(self, form):
-        items_to_add = []
-        item_to_remove = []
-        items = {
+    def __init__(self, **kwargs):
+        self.items = {
             sector[1]: [
                 item.name for item in Item.objects.all() if item.sector == sector[0]
             ] for sector in Sectors.choices
         }
-        for sector, items in items.items():
+
+        return super().__init__(**kwargs)
+
+    def form_valid(self, form):
+        items_to_add = []
+        item_to_remove = []
+        for sector, items in self.items.items():
             for idx, item in enumerate(items):
                 item_object = Item.objects.get(name=item)
                 if self.request.POST.get(f'{sector}-item-{idx}', 'off') == 'on':
@@ -70,15 +74,19 @@ class BoatUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "boat/update_boat.html"
     success_url = reverse_lazy("boat:table-boats")
 
-    def form_valid(self, form):
-        items_to_add = []
-        item_to_remove = []
-        items = {
+    def __init__(self, **kwargs):
+        self.items = {
             sector[1]: [
                 item.name for item in Item.objects.all() if item.sector == sector[0]
             ] for sector in Sectors.choices
         }
-        for sector, items in items.items():
+
+        return super().__init__(**kwargs)
+
+    def form_valid(self, form):
+        items_to_add = []
+        item_to_remove = []
+        for sector, items in self.items.items():
             for idx, item in enumerate(items):
                 item_object = Item.objects.get(name=item)
                 if self.request.POST.get(f'{sector}-item-{idx}', 'off') == 'on':
