@@ -23,6 +23,6 @@ jobs:
                 script: |
                   cd boat_maintenance
                   git pull
-                  cp "envs/.env" ".env"
+                  cp "envs/prod.env" ".env"
                   sudo docker compose down
                   sudo docker compose up --build -d
