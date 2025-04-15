@@ -30,6 +30,15 @@
     <link href="{% static 'css\datatables.min.css' %}" rel="stylesheet">
     {% block extra_css %}
     {% endblock extra_css %}
+    <script>
+        // Check if dark mode is enabled
+        console.log('BASE')
+        const html_element = document.getElementsByTagName('html')[0];
+        if (html_element.getAttribute('data-bs-theme') == 'auto') {
+            const windows_theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            html_element.setAttribute('data-bs-theme', windows_theme);
+        }
+    </script>
 </head>
 <body>
     <div class="container">

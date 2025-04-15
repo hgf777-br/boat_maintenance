@@ -1,26 +1,31 @@
 import json
+
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
+from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.views.generic import ListView, View
-from django.http import HttpResponseRedirect, JsonResponse
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import CreateView, UpdateView
-from django.contrib.auth.hashers import make_password
-from django.contrib import messages
-from django.core.exceptions import ObjectDoesNotExist
 
+from maintenance.models import Sectors
+from occurrence.models import Item
 from user.models import User
-from .models import Boat
+
 from .forms import BoatForm
+from .models import Boat
+
 
 class BoatsTableView(LoginRequiredMixin, ListView):
     model = Boat
     template_name = "boat/table_boats.html"
     context_object_name = "boats_list"
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        users = json.dumps([{'id': user.id, 'name': f'{user.first_name} {user.last_name}'} for user in User.objects.filter(profile='SO')])
+        users = json.dumps([{'id': user.id, 'name': f'{user.first_name} {user.last_name}'}
+                            for user in User.objects.filter(profile='SO')])
         context["users"] = users
         return context
 
@@ -30,41 +35,92 @@ class BoatCreateView(LoginRequiredMixin, CreateView):
     template_name = "boat/create_boat.html"
     form_class = BoatForm
     success_url = reverse_lazy("boat:table-boats")
-    
+
     def form_valid(self, form):
+        items_to_add = []
+        item_to_remove = []
+        items = {
+            sector[1]: [
+                item.name for item in Item.objects.all() if item.sector == sector[0]
+            ] for sector in Sectors.choices
+        }
+        for sector, items in items.items():
+            for idx, item in enumerate(items):
+                item_object = Item.objects.get(name=item)
+                if self.request.POST.get(f'{sector}-item-{idx}', 'off') == 'on':
+                    items_to_add.append(item_object.pk)
+                else:
+                    item_to_remove.append(item_object.pk)
+        self.object.items.remove(*item_to_remove)
+        self.object.items.add(*items_to_add)
         messages.success(self.request, 'Barco criado com sucesso')
+
         return super().form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["items"] = self.items
 
-class BoatUpdateView(LoginRequiredMixin,UpdateView):
+        return context
+
+
+class BoatUpdateView(LoginRequiredMixin, UpdateView):
     model = Boat
     form_class = BoatForm
     template_name = "boat/update_boat.html"
     success_url = reverse_lazy("boat:table-boats")
-    
+
     def form_valid(self, form):
+        items_to_add = []
+        item_to_remove = []
+        items = {
+            sector[1]: [
+                item.name for item in Item.objects.all() if item.sector == sector[0]
+            ] for sector in Sectors.choices
+        }
+        for sector, items in items.items():
+            for idx, item in enumerate(items):
+                item_object = Item.objects.get(name=item)
+                if self.request.POST.get(f'{sector}-item-{idx}', 'off') == 'on':
+                    items_to_add.append(item_object.pk)
+                else:
+                    item_to_remove.append(item_object.pk)
+        self.object.items.remove(*item_to_remove)
+        self.object.items.add(*items_to_add)
         messages.success(self.request, 'Barco atualizado com sucesso')
+
         return super().form_valid(form)
-    
-    
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["boat_items"] = self.object.items.all().values_list('name', flat=True)
+        context["items"] = self.items
+
+        return context
+
+
 class BoatDeleteView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         try:
             boat = Boat.objects.get(pk=kwargs['pk'])
             boat.delete()
-            return JsonResponse({'status': 'ok','message': 'Barco excluído com sucesso'})
+            return JsonResponse({'status': 'ok', 'message': 'Barco excluído com sucesso'})
         except ObjectDoesNotExist:
-            return JsonResponse({'status': 'error','message': 'Barco não encontrado'})
+            return JsonResponse({'status': 'error', 'message': 'Barco não encontrado'})
         except IntegrityError:
-            return JsonResponse({'status': 'error','message': 'Este barco possui ações em andamento. Exclusão não permitida'})
+            return JsonResponse(
+                {'status': 'error', 'message': 'Este barco possui ações em andamento. Exclusão não permitida'}
+            )
         except Exception as e:
-            return JsonResponse({'status': 'error','message': str(e)})
+            return JsonResponse({'status': 'error', 'message': str(e)})
 
 
 class BoatDetailsListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        boats = {boat.id: {"number_shares": boat.number_shares, "share_owners":boat.get_owners(id=True)} for boat in Boat.objects.all()}
+        boats = {boat.id: {"number_shares": boat.number_shares, "share_owners": boat.get_owners(id=True)}
+                 for boat in Boat.objects.all()}
         return JsonResponse(boats)
+
 
 class BoatUpdateOwnersView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
@@ -72,8 +128,8 @@ class BoatUpdateOwnersView(LoginRequiredMixin, View):
             data = json.loads(request.body)
             boat = Boat.objects.get(pk=data['boat_id'])
             boat.set_owners(data['owners'])
-            return JsonResponse({'status': 'ok','message': 'Proprietários alterados com sucesso'})
+            return JsonResponse({'status': 'ok', 'message': 'Proprietários alterados com sucesso'})
         except ObjectDoesNotExist:
-            return JsonResponse({'status': 'error','message': 'Barco não encontrado'})
+            return JsonResponse({'status': 'error', 'message': 'Barco não encontrado'})
         except Exception as e:
-            return JsonResponse({'status': 'error','message': str(e)})
+            return JsonResponse({'status': 'error', 'message': str(e)})

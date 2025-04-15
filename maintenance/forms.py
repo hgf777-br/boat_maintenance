@@ -15,7 +15,7 @@ class MaintenanceForm(forms.ModelForm):
         self.fields['schedule_date'].widget.attrs = {'class': 'form-control', 'placeholder': '#'}
         self.fields['technician'].widget.attrs = {'class': 'form-select', 'placeholder': '#'}
         self.fields['technician'].empty_label = None
-        self.fields['observation'].widget.attrs = {'class': 'form-control', 'placeholder': '#', 'style': 'height: 100px'} 
+        self.fields['obs'].widget.attrs = {'class': 'form-control', 'placeholder': '#', 'style': 'height: 100px'} 
 
     class Meta:
         model = Maintenance
@@ -26,7 +26,7 @@ class MaintenanceForm(forms.ModelForm):
             'due_date',
             'schedule_date',
             'technician',
-            'observation'
+            'obs'
         )
 
 

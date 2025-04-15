@@ -45,7 +45,7 @@
                 <td>{{ maintenance.creator }}</td>
                 <td>{{ maintenance.schedule_date|date:"Y-m-d" }}</td>
                 <td>{{ maintenance.technician|default:"" }}</td>
-                <td>{{ maintenance.observation }}</td>
+                <td>{{ maintenance.obs }}</td>
                 <td>{{ maintenance.id }}</td>
             </tr>
             {% endfor %}
@@ -109,7 +109,7 @@
                         }
                     },
                     {data: 'technician'},
-                    {data: 'observation'},
+                    {data: 'obs'},
                     {data: 'id',
                         render: function(data, type, row) {
                             return  `<div class="d-flex">

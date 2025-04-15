@@ -8,9 +8,15 @@ wa = WhatsApp(
 
 # Send a template message
 wa.send_template(
-    to="5511992966121",
+    to="+5511992966121",
     template=Temp(
-        name="hello_world",
-        language=Temp.Language.ENGLISH_US,
+        name="maintenance",
+        language=Temp.Language.PORTUGUESE_BR,
+        body=[
+            Temp.TextValue(value='15/05/2025'),
+            Temp.TextValue(value='Blue Note'),
+            Temp.TextValue(value='Fernando'),
+            Temp.TextValue(value='Troca do exaustor de popa'),
+        ],
     )
 )

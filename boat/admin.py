@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Boat, BoatItem
+
+admin.site.register(Boat)
+admin.site.register(BoatItem)

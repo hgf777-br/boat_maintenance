@@ -45,6 +45,23 @@
             </div>
         </div>
     </div>
+    <h3 class="mb-3">Itens para Checkout</h3>
+    <div class="row mb-4 g-2">
+        {% for key, values in items.items %}
+            {% if values|length %}
+                <h4 class="">{{ key }}</h4>
+                {% for item in values %}
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" name="{{key}}-item-{{forloop.counter0}}" id="{{key}}-item-{{forloop.counter0}}">
+                            <label class="form-check-label" for="item-{{forloop.counter}}">{{ item }}</label>
+                        </div>
+                    </div>
+                {% endfor %}
+                <hr>
+            {% endif %}
+        {% endfor %}
+    </div>
     <hr>
     <div class="row">
         <div class="col">

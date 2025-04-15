@@ -1,5 +1,6 @@
 from random import choice
 
+
 def make_random_password(
     length=10,
     allowed_chars="abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789",

@@ -11,13 +11,6 @@ const Toast = Swal.mixin({
         }
     });
 
-// Check if dark mode is enabled
-const html_element = document.getElementsByTagName('html')[0];
-if (html_element.getAttribute('data-bs-theme') == 'auto') {
-    const windows_theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    html_element.setAttribute('data-bs-theme', windows_theme);
-}
-
 function compareDates(d1, d2) {
     // Return -1 if d1 is before d2, 1 if d1 is after d2, and 0 if they are the same
     // Convert to UTC to avoid local timezone differences

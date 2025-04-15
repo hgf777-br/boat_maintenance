@@ -16,7 +16,6 @@ from dotenv import load_dotenv
 from django.contrib.messages import constants as messages
 from django.utils.translation import gettext_lazy as _
 
-SITE_ID = 1
 
 # CSRF protection for cross-site request in Docker
 CSRF_TRUSTED_ORIGINS = ["https://hgf777.net.br", "https://www.hgf777.net.br"]
@@ -26,6 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Carregando as variáveis de ambinete
 load_dotenv()
+
+# Application definition
+SITE_ID = os.getenv("SECRET_KEY", default=1)
 
 # message tag classes
 MESSAGE_TAGS = {
@@ -69,14 +71,14 @@ INSTALLED_APPS = [
     'user',
     'boat',
     'technician',
-    'maintenance',
     'occurrence',
+    'maintenance',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware', # locale middleware
+    'django.middleware.locale.LocaleMiddleware',  # locale middleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -115,7 +117,7 @@ EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True")
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 
 # Email para o envio de menssagens
-SYSTEM_EMAIL = "hgf777@gmail.com"
+SYSTEM_EMAIL = "mandaprohgf@gmail.com"
 
 
 # Database
@@ -196,7 +198,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_CHANGE_EMAIL = True
 ACCOUNT_LOGIN_METHODS = ['username', 'email']
-ACCOUNT_PRESERVE_USERNAME_CASING=False
+ACCOUNT_PRESERVE_USERNAME_CASING = False
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_ON_GET = False
@@ -204,5 +206,5 @@ ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = False
 
 CRONTAB_COMMAND_SUFFIX = '2>&1'
 CRONJOBS = [
-    ('*/2 * * * *', 'maintenance.cron.send_email_for_maintenances', '>> /var/log/cron.log'),
+    ('* */1 * * *', 'maintenance.cron.send_email_for_maintenances', '>> /var/log/cron.log'),
 ]
