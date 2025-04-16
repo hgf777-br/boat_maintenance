@@ -19,24 +19,15 @@
         </div>
         <hr>
     </div>
-    <table id="table"
-        data-classes="table table-hover"
-        data-pagination="true"
-        data-search="true"
-        data-sort-name="finish_date"
-        data-sort-order="asc"
-        data-show-pagination-switch="true"
-        data-locale="pt-BR"
-        data-mobile-responsive="true"
-        data-check-on-init="true">
+    <table class="table" id="table">
         <thead>
             <tr>
-                <th data-sortable="true">barco</th>
-                <th data-sortable="true">setor</th>
-                <th data-sortable="true">Periodicidade</th>
-                <th data-sortable="true">descrição</th>
-                <th data-sortable="true">responsável</th>
-                <th data-sortable="false"></th>
+                <th scope="col">barco</th>
+                <th scope="col">setor</th>
+                <th scope="col">Periodicidade</th>
+                <th scope="col">descrição</th>
+                <th scope="col">responsável</th>
+                <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
@@ -47,19 +38,7 @@
                 <td>{{ periodic.get_periodicity_display }}</td>
                 <td>{{ periodic.description }}</td>
                 <td>{{ periodic.creator }}</td>
-                <td>
-                    <div class="d-flex justify-content-center mt-3 mt-sm-0">
-                        <button type="button" id="button-info-{{ periodic.id }}" class="btn btn-info px-4 px-sm-1 me-3 me-sm-1 button-info" title="operação">
-                            <i class="bi bi-info-lg"></i>
-                        </button>
-                        <a href="update/{{ periodic.id }}" class="btn btn-primary px-4 px-sm-1 me-3 me-sm-1" title="editar" id="update-{{ periodic.id }}">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        <button type="button" id="button-delete-{{ periodic.id }}" class="btn btn-danger px-4 px-sm-1 me-3 me-sm-1 button-delete" title="criar nova senha">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                </td>
+                <td>{{ periodic.id }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -69,7 +48,37 @@
 {% block extra_javascript %}
 <script>
     $(function() {
-        $('#table').bootstrapTable();
+        $('#table').DataTable(
+            {
+                deferRender: true,
+                responsive: true,
+                columns: [
+                    {data: 'boat'},
+                    {data: 'sector'},
+                    {data: 'periodicity'},
+                    {data: 'description'},
+                    {data: 'creator'},
+                    {data: 'id',
+                        render: function(data, type, row) {
+                            return  `<div class="d-flex">
+                                    <button type="button" id="button-info-${data}" class="btn btn-info p-1 me-1 button-info" title="operação">
+                                    <i class="bi bi-info-lg"></i></button>
+                                    <a href="update/${data}" class="btn btn-primary p-1 me-1" title="editar"
+                                    id="update-${data}"><i class="bi bi-pencil"></i></a>
+                                    <button type="button" id="button-delete-${data}" class="btn btn-danger p-1 me-2 button-delete" title="criar nova senha">
+                                    <i class="bi bi-trash"></i></button>
+                                    </div>`;
+                        }
+                    }
+                ],
+                columnDefs: [
+                    { responsivePriority: 1, targets: 0 },
+                    { responsivePriority: 2, targets: -1 },
+                    { orderable: false, targets: -1 },
+                    { width: "5%", targets:-1},
+                ],
+            }
+        );
     });
 
     $(document).on('click', '.button-info', function() {

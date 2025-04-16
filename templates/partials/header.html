@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load static %}
 <header class="d-flex flex-wrap justify-content-center py-3 mb-2 border-bottom">
-    <a href="users/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
         <img src="{% static 'images/logo_blue_note_org.png' %}" width="80px"/>
     </a>
 
@@ -126,7 +126,7 @@
                         "X-CSRFToken": "{{csrf_token}}"
                     },
                     credentials: 'same-origin',})
-                .then(response => response.json())  
+                .then(response => response.json())
                 .then(data => {
                     if (data.status === 'ok') {
                         Toast.fire({
@@ -142,7 +142,7 @@
                         });
                     }
                     // location.reload();
-                })    
+                })
                 .catch(error => console.error(error));
             }
         }).catch(function(event) {

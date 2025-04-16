@@ -19,26 +19,15 @@
         </div>
         <hr>
     </div>
-    <table id="table"
-        data-classes="table table-hover"
-        data-pagination="true"
-        data-search="true"
-        data-show-pagination-switch="true"
-        data-locale="pt-BR"
-        data-mobile-responsive="true"
-        data-check-on-init="true">
+    <table class="table" id="table">
         <thead>
             <tr>
-                <th data-sortable="true">nome</th>
-                <th data-sortable="true">cotas</th>
-                <th data-sortable="true">fabricante</th>
-                <th data-sortable="true">modelo</th>
-                <th data-sortable="true">ano</th>
-                <th
-                data-sortable="false"
-                data-width="5"
-                data-width-unit="%">
-                </th>
+                <th scope="col">nome</th>
+                <th scope="col">cotas</th>
+                <th scope="col">fabricante</th>
+                <th scope="col">modelo</th>
+                <th scope="col">ano</th>
+                <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
@@ -49,19 +38,7 @@
                 <td>{{ boat.manufacturer }}</td>
                 <td>{{ boat.model }}</td>
                 <td>{{ boat.year_built }}</td>
-                <td>
-                    <div class="d-flex justify-content-center mt-3 mt-sm-0">
-                        <button type="button" id="button-share-owners-{{ boat.id }}" class="btn btn-warning px-4 px-sm-1 me-3 me-sm-2 button-share-owners" title="criar nova senha">
-                            <i class="bi bi-person"></i>
-                        </button>
-                        <a href="update/{{ boat.id }}" class="btn btn-primary px-4 px-sm-1 me-3 me-sm-2" title="editar" id="update-{{ boat.id }}">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        <button type="button" id="button-delete-{{ boat.id }}" class="btn btn-danger px-4 px-sm-1 me-3 me-sm-2 button-delete" title="criar nova senha">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                </td>
+                <td>{{ boat.id }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -71,7 +48,37 @@
 {% block extra_javascript %}
 <script>
     $(function() {
-        $('#table').bootstrapTable();
+        $('#table').DataTable(
+            {
+                deferRender: true,
+                responsive: true,
+                columns: [
+                    {data: 'name'},
+                    {data: 'number_shares'},
+                    {data: 'manufacturer'},
+                    {data: 'model'},
+                    {data: 'year_built'},
+                    {data: 'id',
+                        render: function(data, type, row) {
+                            return  `<div class="d-flex">
+                                    <button type="button" id="button-share-owners-${data}" class="btn btn-warning p-1 me-1 button-share-owners" title="criar nova senha">
+                                    <i class="bi bi-person"></i></button>
+                                    <a href="update/${data}" class="btn btn-primary p-1 me-1" title="editar"
+                                    id="update-${data}"><i class="bi bi-pencil"></i></a>
+                                    <button type="button" id="button-delete-${data}" class="btn btn-danger p-1 me-2 button-delete" title="criar nova senha">
+                                    <i class="bi bi-trash"></i></button>
+                                    </div>`;
+                        }
+                    }
+                ],
+                columnDefs: [
+                    { responsivePriority: 1, targets: 0 },
+                    { responsivePriority: 2, targets: -1 },
+                    { orderable: false, targets: -1 },
+                    { width: "5%", targets:-1},
+                ],
+            }
+        );
     });
 
     // Sistema para definir os cotistas do barco
@@ -100,7 +107,7 @@
                 const html_content = $('#fields-share-owners');
                 const url = "{% url 'boat:details-list-boat' %}";
                 fetch(url)
-                .then(response => response.json())
+                .then(response => response.json())  
                 .then(data => {
                     console.log('data', data[boat_id])
                     const boat = data[boat_id];
@@ -122,7 +129,7 @@
                         document.getElementById(`share-${i}`).value = owner;
                     }
                 });
-
+                
             },
             preConfirm: function () {
                 return new Promise(function (resolve) {
@@ -154,7 +161,7 @@
                         "X-CSRFToken": "{{csrf_token}}"
                     },
                     credentials: 'same-origin',})
-                .then(response => response.json())
+                .then(response => response.json())  
                 .then(data => {
                     if (data.status === 'ok') {
                         Toast.fire({
@@ -170,7 +177,7 @@
                         });
                     }
                     // ocation.reload();
-                })
+                })    
                 .catch(error => console.error(error));
             }
         }).catch(function(event) {
@@ -218,9 +225,9 @@
                             background: "#FFB0B0",
                         });
                     }
-                    })
+                    }) 
                 .catch(error => console.error(error));
-            }
+            } 
         });
     })
 </script>

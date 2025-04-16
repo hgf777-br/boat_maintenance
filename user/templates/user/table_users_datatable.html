@@ -19,28 +19,17 @@
         </div>
         <hr>
     </div>
-    <table id="table"
-        data-classes="table table-hover"
-        data-pagination="true"
-        data-search="true"
-        data-show-pagination-switch="true"
-        data-locale="pt-BR"
-        data-mobile-responsive="true"
-        data-check-on-init="true">
+    <table class="table" id="table">
         <thead>
             <tr>
-                <th data-sortable="true">usuário</th>
-                <th data-sortable="true">perfil</th>
-                <th data-sortable="true">email</th>
-                <th data-sortable="true">nome</th>
-                <th data-sortable="true">sobrenome</th>
-                <th data-sortable="true">telefone</th>
-                <th data-sortable="true">tema</th>
-                <th
-                data-sortable="false"
-                data-width="5"
-                data-width-unit="%">
-                </th>
+                <th scope="col">usuário</th>
+                <th scope="col">perfil</th>
+                <th scope="col">email</th>
+                <th scope="col">nome</th>
+                <th scope="col">sobrenome</th>
+                <th scope="col">telefone</th>
+                <th scope="col">tema</th>
+                <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
@@ -53,16 +42,7 @@
                 <td>{{ user.last_name }}</td>
                 <td>{{ user.phone }}</td>
                 <td>{{ user.get_theme_display }}</td>
-                <td>
-                    <div class="d-flex justify-content-center mt-3 mt-sm-0">
-                        <button type="button" id="new-password-{{ user.id }}" class="btn btn-warning px-4 px-sm-1 me-3 me-sm-2 button-new-password" title="criar nova senha">
-                        <i class="bi bi-key"></i></button>
-                        <a href="update/{{ user.id }}" class="btn btn-primary px-4 px-sm-1 me-3 me-sm-2" title="editar"
-                        id="update-{{ user.id }}"><i class="bi bi-pencil"></i></a>
-                        <button type="button" id="new-password-{{ user.id }}" class="btn btn-danger px-4 px-sm-1 me-3 me-sm-2 button-delete" title="criar nova senha">
-                        <i class="bi bi-trash"></i></button>
-                    </div>
-                </td>
+                <td>{{ user.id }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -72,16 +52,40 @@
 {% block extra_javascript %}
 <script>
     $(function() {
-        $('#table').bootstrapTable();
+        $('#table').DataTable(
+            {
+                deferRender: true,
+                responsive: true,
+                columns: [
+                    {data: 'username'},
+                    {data: 'profile'},
+                    {data: 'email'},
+                    {data: 'first_name'},
+                    {data: 'last_name'},
+                    {data: 'phone'},
+                    {data: 'theme'},
+                    {data: 'id',
+                        render: function(data, type, row) {
+                            return  `<div class="d-flex">
+                                    <button type="button" id="new-password-${data}" class="btn btn-warning p-1 me-1 button-new-password" title="criar nova senha">
+                                    <i class="bi bi-key"></i></button>
+                                    <a href="update/${data}" class="btn btn-primary p-1 me-1" title="editar"
+                                    id="update-${data}"><i class="bi bi-pencil"></i></a>
+                                    <button type="button" id="new-password-${data}" class="btn btn-danger p-1 me-2 button-delete" title="criar nova senha">
+                                    <i class="bi bi-trash"></i></button>
+                                    </div>`;
+                        }
+                    }
+                ],
+                columnDefs: [
+                    { responsivePriority: 1, targets: 0 },
+                    { responsivePriority: 2, targets: -1 },
+                    { orderable: false, targets: -1 },
+                    { width: "5%", targets:-1},
+                ],
+            }
+        );
     });
-
-    window.detailFormatter = (index, row) => {
-        const html = []
-        $.each(row, function (key, value) {
-            html.push(`<p><b>${key}:</b> ${value}</p>`)
-        })
-        return html.join('')
-    }
 
     $(document).on('click', '.button-new-password', function() {
         // enviar email com uma nova senha para o usuário

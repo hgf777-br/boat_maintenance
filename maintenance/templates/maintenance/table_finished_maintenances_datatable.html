@@ -16,25 +16,16 @@
         </div>
         <hr>
     </div>
-    <table id="table"
-        data-classes="table table-hover"
-        data-pagination="true"
-        data-search="true"
-        data-sort-name="finish_date"
-        data-sort-order="asc"
-        data-show-pagination-switch="true"
-        data-locale="pt-BR"
-        data-mobile-responsive="true"
-        data-check-on-init="true">
+    <table class="table" id="table">
         <thead>
             <tr>
-                <th data-sortable="true">barco</th>
-                <th data-field="finish_date" data-sortable="true" data-formatter="finish_date_formatter">data finalização</th>
-                <th data-sortable="true">setor</th>
-                <th data-sortable="true">descrição</th>
-                <th data-sortable="true">responsável</th>
-                <th data-sortable="true">tecnico</th>
-                <th data-sortable="false"></th>
+                <th scope="col">barco</th>
+                <th scope="col">data finalização</th>
+                <th scope="col">setor</th>
+                <th scope="col">descrição</th>
+                <th scope="col">responsável</th>
+                <th scope="col">tecnico</th>
+                <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
@@ -46,13 +37,7 @@
                 <td>{{ maintenance.description }}</td>
                 <td>{{ maintenance.creator }}</td>
                 <td>{{ maintenance.technician|default:"" }}</td>
-                <td>
-                    <div class="d-flex justify-content-center mt-3 mt-sm-0">
-                        <button type="button" id="button-info-{{ maintenance.id }}" class="btn btn-info px-4 px-sm-1 me-3 me-sm-1 button-info" title="informação">
-                            <i class="bi bi-info-lg"></i>
-                        </button>
-                    </div>
-                </td>
+                <td>{{ maintenance.id }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -62,19 +47,44 @@
 {% block extra_javascript %}
 <script>
     $(function() {
-        $('#table').bootstrapTable();
+        $('#table').DataTable(
+            {
+                deferRender: true,
+                responsive: true,
+                order: [[1, 'dsc']],
+                columnDefs: [
+                    { targets: 0, responsivePriority: 1 },
+                    { targets: -1, responsivePriority: 2 },
+                    { targets: -1, orderable: false },
+                    { targets: -1, width: "5%"},
+                    { targets: -1, 
+                        render: function(data, type, row) {
+                                    return  `<div class="d-flex">
+                                            <button type="button" id="button-info-${data}" class="btn btn-info p-1 me-1 button-info" title="informação">
+                                            <i class="bi bi-info-lg"></i></button>
+                                            </div>`;
+                                }
+                    },
+                    { targets: 1,
+                        render: function(data, type, row) {
+                            const finishedDate = new Date(data + 'T00:00:00');
+                            if (type == 'display' || type == 'filter') {
+                                return finishedDate.toLocaleDateString();
+                            }
+                            return data;
+                        }
+                    },
+                    {targets: "_all", className: "dt-left"},
+                ],
+            }
+        );
     });
-
-    window.finish_date_formatter = (value, row, index, field) => {
-        const dueDate = new Date(value + 'T00:00:00');
-        return dueDate.toLocaleDateString();
-    }
 
     $(document).on('click', '.button-info', function() {
         const id = $(this).attr('id').split('-')[2];
         const url = "{% url 'maintenance:details-maintenance' 1 %}".replace('1', id);
         fetch(url)
-        .then(response => response.json())
+        .then(response => response.json())  
         .then(data => {
             console.log(data)
             Swal.fire({

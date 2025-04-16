@@ -19,32 +19,19 @@
         </div>
         <hr>
     </div>
-    <table id="table"
-        data-classes="table table-hover"
-        data-pagination="true"
-        data-search="true"
-        data-sort-name="due_date"
-        data-sort-order="asc"
-        data-show-pagination-switch="true"
-        data-locale="pt-BR"
-        data-mobile-responsive="true"
-        data-check-on-init="true">
+    <table class="table" id="table">
         <thead>
             <tr>
-                <th data-field="name" data-sortable="true">barco</th>
-                <th data-field="due_date" data-sortable="true" data-formatter="due_date_formatter" data-cell-style="due_date_style">data limite</th>
-                <th data_field="periodic" data-sortable="true" data-formatter="periodic_formatter">Periodicidade</th>
-                <th data-sortable="true">setor</th>
-                <th data-sortable="true">descrição</th>
-                <th data-sortable="true">responsável</th>
-                <th data-field="schedule_date" data-sortable="true" data-formatter="schedule_date_formatter" data-cell-style="schedule_date_style">data agendada</th>
-                <th data-sortable="true">tecnico</th>
-                <th data-sortable="true">observações</th>
-                <th
-                data-sortable="false"
-                data-width="5"
-                data-width-unit="%">
-                </th>
+                <th scope="col">barco</th>
+                <th scope="col">data limite</th>
+                <th scope="col">Periódica</th>
+                <th scope="col">setor</th>
+                <th scope="col">descrição</th>
+                <th scope="col">responsável</th>
+                <th scope="col">data agendada</th>
+                <th scope="col">tecnico</th>
+                <th scope="col">observações</th>
+                <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
@@ -59,19 +46,7 @@
                 <td>{{ maintenance.schedule_date|date:"Y-m-d" }}</td>
                 <td>{{ maintenance.technician|default:"" }}</td>
                 <td>{{ maintenance.obs }}</td>
-                <td>
-                    <div class="d-flex justify-content-center mt-3 mt-sm-0">
-                        <button type="button" id="button-operation-{{ maintenance.id }}" class="btn btn-warning px-4 px-sm-1 me-3 me-sm-1 button-operation" title="operação">
-                            <i class="bi bi-gear"></i>
-                        </button>
-                        <a href="update/{{ maintenance.id }}" class="btn btn-primary px-4 px-sm-1 me-3 me-sm-1" title="editar" id="update-{{ maintenance.id }}">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        <button type="button" id="button-delete-{{ maintenance.id }}" class="btn btn-danger px-4 px-sm-1 me-3 me-sm-1 button-delete" title="criar nova senha">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                </td>
+                <td>{{ maintenance.id }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -82,47 +57,81 @@
 <script src="{% static 'js/jquery.mask.min.js' %}" crossorigin="anonymous"></script>
 <script>
     $(function() {
-        $('#table').bootstrapTable();
+        $('#table').DataTable(
+            {
+                deferRender: true,
+                responsive: true,
+                order: [[1, 'asc']],
+                columns: [
+                    {data: 'boat'},
+                    {data: 'due_date',
+                        render: function(data, type, row) {
+                            const today = new Date().setHours(0,0,0,0);
+                            const dueDate = new Date(data + 'T00:00:00');
+                            if (type == 'display' || type == 'filter') {
+                                if (dueDate < today) {
+                                    return `<span class="text-danger">${dueDate.toLocaleDateString()}</span>`;
+                                } else if (dueDate > today) {
+                                    return `<span class="text-success">${dueDate.toLocaleDateString()}</span>`
+                                } else {
+                                    return `<span class="text-primary">${dueDate.toLocaleDateString()}</span>`;
+                                }
+                            }
+                            return data;
+                        }
+                    },
+                    {data: 'periodic',
+                        render: function(data, type, row) {
+                            return data == '' ? 'não' : data;
+                        }
+                    },
+                    {data: 'sector'},
+                    {data: 'description'},
+                    {data: 'creator'},
+                    {data: 'schedule_date',
+                        render: function(data, type, row) {
+                            if (data !== '') {
+                                const today = new Date().setHours(0,0,0,0);
+                                const dueDate = new Date(row.due_date + 'T00:00:00');
+                                const scheduleDate = new Date(data + 'T00:00:00');
+                                if (type == 'display' || type == 'filter') {
+                                    if (scheduleDate < today) {
+                                        return `<span class="text-danger">${scheduleDate.toLocaleDateString()}</span>`;
+                                    } else if (scheduleDate > today) {
+                                        return `<span class="text-success">${scheduleDate.toLocaleDateString()}</span>`
+                                    } else {
+                                        return `<span class="text-primary">${scheduleDate.toLocaleDateString()}</span>`;
+                                    }
+                                }
+                                return data;
+                            }
+                            return data;
+                        }
+                    },
+                    {data: 'technician'},
+                    {data: 'obs'},
+                    {data: 'id',
+                        render: function(data, type, row) {
+                            return  `<div class="d-flex">
+                                    <button type="button" id="button-operation-${data}" class="btn btn-warning p-1 me-1 button-operation" title="operação">
+                                    <i class="bi bi-gear"></i></button>
+                                    <a href="update/${data}" class="btn btn-primary p-1 me-1" title="editar"
+                                    id="update-${data}"><i class="bi bi-pencil"></i></a>
+                                    <button type="button" id="button-delete-${data}" class="btn btn-danger p-1 me-2 button-delete" title="criar nova senha">
+                                    <i class="bi bi-trash"></i></button>
+                                    </div>`;
+                        }
+                    }
+                ],
+                columnDefs: [
+                    { responsivePriority: 1, targets: 0 },
+                    { responsivePriority: 2, targets: -1 },
+                    { orderable: false, targets: -1 },
+                    { width: "5%", targets:-1},
+                ],
+            }
+        );
     });
-
-    function date_style(date) {
-        const today = new Date().setHours(0,0,0,0);
-        const newDate = new Date(date + 'T00:00:00');
-        let column_class = "";
-        if (newDate < today) {
-            column_class = "text-danger";
-        } else if (newDate > today) {
-            column_class = "text-success";
-        } else {
-            column_class = "text-primary";
-        }
-        return {classes: column_class};
-    }
-
-    window.due_date_style = (value, row, index, field) => {
-        return date_style(value);
-    }
-
-    window.schedule_date_style = (value, row, index, field) => {
-        return date_style(value);
-    }
-
-    window.due_date_formatter = (value, row, index, field) => {
-        const dueDate = new Date(value + 'T00:00:00');
-        return dueDate.toLocaleDateString();
-    }
-
-    window.schedule_date_formatter = (value, row, index, field) => {
-        if (value == '') {
-            return '';
-        }
-        const scheduleDate = new Date(value + 'T00:00:00');
-        return scheduleDate.toLocaleDateString();
-    }
-
-    window.periodic_formatter = (value, row, index, field) => {
-        return value != '' ? value : 'pontual';
-    }
 
     $(document).on('click', '.button-operation', function() {
         console.log('operação');
@@ -268,7 +277,7 @@
                                 location.reload();
                             }
                         }, 2000);
-                    })
+                    })    
                     .catch(error => console.error(error));
                 }
         })
@@ -314,9 +323,9 @@
                             background: "#FFB0B0",
                         });
                     }
-                    })
+                    }) 
                 .catch(error => console.error(error));
-            }
+            } 
         });
     })
 </script>
