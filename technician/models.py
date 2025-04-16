@@ -16,8 +16,10 @@ class Technician(models.Model):
     name = models.CharField(max_length=64, verbose_name=_("name"))
     phone = models.CharField(max_length=16, verbose_name=_("cell phone"))
     email = models.EmailField(max_length=256, verbose_name=_("email"))
-    speciality = models.CharField(max_length=2, choices=Specialities, verbose_name=_("speciality"), blank=False, default=Specialities.MECHANIC)
+    speciality = models.CharField(max_length=2, choices=Specialities, verbose_name=_("speciality"),
+                                  blank=False, default=Specialities.MECHANIC,)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("created at"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("updated at"))
+
     def __str__(self):
         return self.name
