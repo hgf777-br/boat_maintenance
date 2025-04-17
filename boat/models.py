@@ -24,6 +24,9 @@ class Boat(models.Model):
     model = models.CharField(max_length=64, blank=True, null=True)
     year_built = models.PositiveIntegerField(choices=YEAR_CHOICES, default=1970)
     items = models.ManyToManyField("occurrence.Item", through="BoatItem", verbose_name=_('items'))
+    users_for_reminders = (
+        models.ManyToManyField(settings.AUTH_USER_MODEL, through="UserReminder", verbose_name=_('users for reminders'))
+    )
     share_owner_1 = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='share_owner_1',
                                       on_delete=models.SET_NULL, blank=True, null=True,)
     share_owner_2 = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='share_owner_2',
@@ -101,3 +104,11 @@ class BoatItem(models.Model):
 
     def __str__(self):
         return f"{self.boat.name} <> {self.item.name}"
+
+
+class UserReminder(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name=_("user"))
+    boat = models.ForeignKey(Boat, on_delete=models.CASCADE, verbose_name=_("boat"))
+
+    def __str__(self):
+        return f"{self.user.get_full_name()} <> {self.boat.name}"

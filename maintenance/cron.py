@@ -22,6 +22,6 @@ def send_email_for_maintenances():
         "Teste de email de manutenção - IGNORAR vai  receber a cada 3 horas",
         message,
         "mandaprohgf@gmail.com",
-        ["hgf777@gmail.com"],
+        ["hgf777@gmail.com", "abelmferreira@gmail.com", "daniela@flipboatclub.com.br"],
         fail_silently=False,
     )

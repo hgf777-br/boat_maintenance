@@ -1,19 +1,19 @@
-from datetime import datetime, timedelta
 import json
-from django.shortcuts import render
-from django.urls import reverse_lazy
-from django.views.generic import ListView, View, DetailView
-from django.http import HttpResponseRedirect, JsonResponse
+from datetime import datetime
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic.edit import CreateView, UpdateView
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponseRedirect, JsonResponse
+from django.urls import reverse_lazy
+from django.views.generic import ListView, View
+from django.views.generic.edit import CreateView, UpdateView
 from rest_framework import serializers
-from rest_framework.response import Response
 
-from .models import Maintenance, Periodic
-from .forms import MaintenanceForm, PeriodicForm
 from technician.models import Technician
+
+from .forms import MaintenanceForm, PeriodicForm
+from .models import Maintenance, Periodic
 
 MONTHS = {
     'January': 1,
@@ -46,16 +46,20 @@ class MaintenancesPendingTableView(LoginRequiredMixin, ListView):
     template_name = "maintenance/table_pending_maintenances.html"
     context_object_name = "maintenances_list"
     success_url = reverse_lazy("maintenance:table-pending-maintenances")
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        technicians = json.dumps([{'id': technician.id, 'name': technician.name} for technician in Technician.objects.all()])
+        technicians = json.dumps(
+            [{'id': technician.id, 'name': technician.name} for technician in Technician.objects.all()]
+        )
         context["technicians"] = technicians
         return context
-    
+
     def get_queryset(self):
         if self.request.user.profile == 'SO':
+            print(self.request.user)
             boat_user = self.request.user.get_boat()
+            print(boat_user)
             return Maintenance.objects.filter(boat=boat_user, completed=False)
         return Maintenance.objects.filter(completed=False)
 
@@ -65,7 +69,7 @@ class MaintenancesFinishedTableView(LoginRequiredMixin, ListView):
     template_name = "maintenance/table_finished_maintenances.html"
     context_object_name = "maintenances_list"
     success_url = reverse_lazy("maintenance:table-finished-maintenances")
-    
+
     def get_queryset(self):
         if self.request.user.profile == 'SO':
             boat_user = self.request.user.get_boat()
@@ -78,7 +82,7 @@ class MaintenanceCreateView(LoginRequiredMixin, CreateView):
     form_class = MaintenanceForm
     template_name = "maintenance/create_maintenance.html"
     success_url = reverse_lazy("maintenance:table-pending-maintenances")
-    
+
     def form_valid(self, form):
         maintenance = form.save(commit=False)
         maintenance.creator = self.request.user
@@ -92,7 +96,7 @@ class MaintenanceUpdateView(LoginRequiredMixin, UpdateView):
     form_class = MaintenanceForm
     template_name = "maintenance/update_maintenance.html"
     success_url = reverse_lazy("maintenance:table-pending-maintenances")
-    
+
     def form_valid(self, form):
         messages.success(self.request, 'Manutenção atualizada com sucesso')
         return super().form_valid(form)
@@ -104,11 +108,11 @@ class MaintenanceDeleteView(LoginRequiredMixin, View):
         try:
             maintenance = Maintenance.objects.get(pk=kwargs['pk'])
             maintenance.delete()
-            return JsonResponse({'status': 'ok','message': 'Manutenção excluída com sucesso'})
+            return JsonResponse({'status': 'ok', 'message': 'Manutenção excluída com sucesso'})
         except ObjectDoesNotExist:
-            return JsonResponse({'status': 'error','message': 'Manutenção não encontrada'})
+            return JsonResponse({'status': 'error', 'message': 'Manutenção não encontrada'})
         except Exception as e:
-            return JsonResponse({'status': 'error','message': str(e)})
+            return JsonResponse({'status': 'error', 'message': str(e)})
 
 
 class MaintenanceFlowView(LoginRequiredMixin, View):
@@ -138,22 +142,24 @@ class MaintenanceFlowView(LoginRequiredMixin, View):
                 maintenance.schedule_date = schedule_date
                 maintenance.technician = technician
             maintenance.save()
-            return JsonResponse({'status': 'ok','message': 'Status da manutenção alterado com sucesso'})
+            return JsonResponse({'status': 'ok', 'message': 'Status da manutenção alterado com sucesso'})
         except ObjectDoesNotExist:
-            return JsonResponse({'status': 'error','message': 'Manutenção ou técnico não encontrados'})
+            return JsonResponse({'status': 'error', 'message': 'Manutenção ou técnico não encontrados'})
         except Exception as e:
-            return JsonResponse({'status': 'error','message': str(e)})
+            return JsonResponse({'status': 'error', 'message': str(e)})
 
 
 class MaintenanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Maintenance
         fields = '__all__'
-        
+
     def to_representation(self, instance):
         instance.due_date = instance.due_date.strftime(r'%d/%m/%Y')
         instance.sector = instance.get_sector_display()
-        instance.schedule_date = instance.schedule_date.strftime(r'%d/%m/%Y') if instance.schedule_date else 'não agendada'
+        instance.schedule_date = (
+            instance.schedule_date.strftime(r'%d/%m/%Y') if instance.schedule_date else 'não agendada'
+        )
         instance.finish_date = instance.finish_date.strftime(r'%d/%m/%Y') if instance.finish_date else 'não concluída'
         ret = super().to_representation(instance)
         ret['boat'] = instance.boat.name
@@ -161,18 +167,20 @@ class MaintenanceSerializer(serializers.ModelSerializer):
         print(ret)
         return ret
 
+
 class MaintenanceDetailsView(LoginRequiredMixin, View):
     def get(self, request, pk, *args, **kwargs):
         maintenance = Maintenance.objects.get(pk=pk)
         serialized_data = MaintenanceSerializer(maintenance)
         return JsonResponse(serialized_data.data)
 
+
 class PeriodicsTableView(LoginRequiredMixin, ListView):
-    model=Periodic
-    template_name="maintenance/table_periodics.html"
-    context_object_name="periodics_list"
+    model = Periodic
+    template_name = "maintenance/table_periodics.html"
+    context_object_name = "periodics_list"
     success_url = reverse_lazy("maintenance:table-periodics")
-    
+
     def get_queryset(self):
         if self.request.user.profile == 'SO':
             boat_user = self.request.user.get_boat()
@@ -181,11 +189,11 @@ class PeriodicsTableView(LoginRequiredMixin, ListView):
 
 
 class PeriodicCreateView(LoginRequiredMixin, CreateView):
-    model=Periodic
-    form_class=PeriodicForm
-    template_name="maintenance/create_periodic.html"
+    model = Periodic
+    form_class = PeriodicForm
+    template_name = "maintenance/create_periodic.html"
     success_url = reverse_lazy("maintenance:table-periodics")
-    
+
     def form_valid(self, form):
         periodic = form.save(commit=False)
         periodic.creator = self.request.user
@@ -205,11 +213,11 @@ class PeriodicCreateView(LoginRequiredMixin, CreateView):
 
 
 class PeriodicUpdateView(LoginRequiredMixin, UpdateView):
-    model=Periodic
-    form_class=PeriodicForm
-    template_name="maintenance/update_periodic.html"
+    model = Periodic
+    form_class = PeriodicForm
+    template_name = "maintenance/update_periodic.html"
     success_url = reverse_lazy("maintenance:table-periodics")
-    
+
     def form_valid(self, form):
         messages.success(self.request, 'Manutenção Periódica atualizada com sucesso')
         return super().form_valid(form)
@@ -220,18 +228,18 @@ class PeriodicDeleteView(LoginRequiredMixin, View):
         try:
             periodic = Periodic.objects.get(pk=kwargs["pk"])
             periodic.delete()
-            return JsonResponse({"status": "ok","message": "Manutenção Periódica excluída com sucesso"})
+            return JsonResponse({"status": "ok", "message": "Manutenção Periódica excluída com sucesso"})
         except ObjectDoesNotExist:
-            return JsonResponse({"status": "error","message": "Manutenção Periódica não encontrada"})
+            return JsonResponse({"status": "error", "message": "Manutenção Periódica não encontrada"})
         except Exception as e:
-            return JsonResponse({"status": "error","message": str(e)})
+            return JsonResponse({"status": "error", "message": str(e)})
 
 
 class PeriodicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Periodic
         fields = '__all__'
-        
+
     def to_representation(self, instance):
         instance.sector = instance.get_sector_display()
         instance.periodicity_week_day = instance.get_periodicity_week_day_display()
@@ -241,6 +249,7 @@ class PeriodicSerializer(serializers.ModelSerializer):
         ret['periodicity_display'] = instance.get_periodicity_display()
         print(ret)
         return ret
+
 
 class PeriodicDetailsView(LoginRequiredMixin, View):
     def get(self, request, pk, *args, **kwargs):

@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse_lazy
 from django.views.generic import ListView, View
 from django.views.generic.edit import CreateView, UpdateView
@@ -46,6 +46,7 @@ class BoatCreateView(LoginRequiredMixin, CreateView):
         return super().__init__(**kwargs)
 
     def form_valid(self, form):
+        boat = form.save()
         items_to_add = []
         item_to_remove = []
         for sector, items in self.items.items():
@@ -55,11 +56,10 @@ class BoatCreateView(LoginRequiredMixin, CreateView):
                     items_to_add.append(item_object.pk)
                 else:
                     item_to_remove.append(item_object.pk)
-        self.object.items.remove(*item_to_remove)
-        self.object.items.add(*items_to_add)
+        boat.items.add(*items_to_add)
         messages.success(self.request, 'Barco criado com sucesso')
 
-        return super().form_valid(form)
+        return HttpResponseRedirect(self.success_url)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -73,6 +73,7 @@ class BoatUpdateView(LoginRequiredMixin, UpdateView):
     form_class = BoatForm
     template_name = "boat/update_boat.html"
     success_url = reverse_lazy("boat:table-boats")
+    users_for_reminder = []
 
     def __init__(self, **kwargs):
         self.items = {
@@ -84,6 +85,7 @@ class BoatUpdateView(LoginRequiredMixin, UpdateView):
         return super().__init__(**kwargs)
 
     def form_valid(self, form):
+        # managing checkout items
         items_to_add = []
         item_to_remove = []
         for sector, items in self.items.items():
@@ -95,6 +97,18 @@ class BoatUpdateView(LoginRequiredMixin, UpdateView):
                     item_to_remove.append(item_object.pk)
         self.object.items.remove(*item_to_remove)
         self.object.items.add(*items_to_add)
+
+        # managing user to receive reminders
+        users_to_remove = []
+        users_to_add = []
+        for idx, user in enumerate(self.users_for_reminder):
+            if self.request.POST.get(f'user-{idx}', 'off') == 'on':
+                users_to_add.append(user.pk)
+            else:
+                users_to_remove.append(user.pk)
+        self.object.users_for_reminders.remove(*users_to_remove)
+        self.object.users_for_reminders.add(*users_to_add)
+
         messages.success(self.request, 'Barco atualizado com sucesso')
 
         return super().form_valid(form)
@@ -103,6 +117,9 @@ class BoatUpdateView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context["boat_items"] = self.object.items.all().values_list('name', flat=True)
         context["items"] = self.items
+        self.users_for_reminder = [owner for owner in self.object.get_owners() if owner is not None]
+        self.users_for_reminder.extend(list(User.objects.exclude(profile='SO')))
+        context['users_for_reminder'] = self.users_for_reminder
 
         return context
 

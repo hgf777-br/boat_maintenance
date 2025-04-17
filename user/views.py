@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, View
 from django.http import HttpResponseRedirect, JsonResponse
-# from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import CreateView, UpdateView
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
@@ -65,12 +65,12 @@ class UserDeleteView(UserNotShareOwner, View):
             return JsonResponse({"status": "error", "message": str(e)})
 
 
-class UserChangePasswordView(UserNotShareOwner, View):
+class UserChangePasswordView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
         user = User.objects.get(pk=data["user_id"])
-        if user.check_password(data["actual_password"]):
-            user.set_password(data["new_password"])
+        if user.check_password(data["actual_password"].strip()):
+            user.set_password(data["new_password"].strip())
             user.save()
             return JsonResponse({"status": "ok", "message": "Senha alterada com sucesso"})
         return JsonResponse({"status": "error", "message": "Senha atual inválida"})
