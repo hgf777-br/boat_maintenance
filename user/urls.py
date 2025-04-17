@@ -8,6 +8,7 @@ from .views import (
     UserDeleteView,
     UserChangePasswordView,
     UserSendNewPasswordView,
+    TestSendEmailView
 )
 
 app_name = 'user'
@@ -23,5 +24,6 @@ urlpatterns = [
         TemplateView.as_view(template_name='users/profile.html'),
         name='profile',
     ),
-    path('teste/', TemplateView.as_view(template_name='user/teste.html'), name='teste'),
+    # path('teste/', TemplateView.as_view(template_name='user/teste.html'), name='teste'),
+    path('teste/', TestSendEmailView.as_view(), name='teste'),
 ]

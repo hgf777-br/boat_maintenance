@@ -206,5 +206,5 @@ ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = False
 
 CRONTAB_COMMAND_SUFFIX = '2>&1'
 CRONJOBS = [
-    ('0 * * * *', 'maintenance.cron.send_email_for_maintenances', '>> /var/log/cron.log'),
+    ('0 */3 * * *', 'maintenance.cron.send_email_for_maintenances', '>> /var/log/cron.log'),
 ]
