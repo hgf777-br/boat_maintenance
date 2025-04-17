@@ -17,7 +17,7 @@ class Boat(models.Model):
         JENNEAU = 'Jenneau', 'Jenneau'
         MJ = 'MJ', 'MJ'
 
-    name = models.CharField(max_length=64, unique=True, verbose_name=_('name'))
+    name = models.CharField(max_length=64, unique=True, verbose_name=_('name'), default='Unnamed Boat')
     number_shares = models.PositiveIntegerField(default=8, verbose_name=_('number of shares'))
     manufacturer = models.CharField(max_length=64, choices=Manufacturer, default=Manufacturer.FAST,
                                     verbose_name=_('manufacturer'))
