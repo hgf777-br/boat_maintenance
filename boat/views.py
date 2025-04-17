@@ -73,16 +73,16 @@ class BoatUpdateView(LoginRequiredMixin, UpdateView):
     form_class = BoatForm
     template_name = "boat/update_boat.html"
     success_url = reverse_lazy("boat:table-boats")
-    users_for_reminder = []
 
-    def __init__(self, **kwargs):
+    def setup(self, request, *args, **kwargs):
         self.items = {
             sector[1]: [
                 item.name for item in Item.objects.all() if item.sector == sector[0]
             ] for sector in Sectors.choices
         }
+        self.users_for_notification = []
 
-        return super().__init__(**kwargs)
+        return super().setup(request, *args, **kwargs)
 
     def form_valid(self, form):
         # managing checkout items
@@ -99,15 +99,17 @@ class BoatUpdateView(LoginRequiredMixin, UpdateView):
         self.object.items.add(*items_to_add)
 
         # managing user to receive reminders
+        users_for_notification = [owner for owner in self.object.get_owners() if owner is not None]
+        users_for_notification.extend(list(User.objects.exclude(profile='SO')))
         users_to_remove = []
         users_to_add = []
-        for idx, user in enumerate(self.users_for_reminder):
+        for idx, user in enumerate(users_for_notification):
             if self.request.POST.get(f'user-{idx}', 'off') == 'on':
                 users_to_add.append(user.pk)
             else:
                 users_to_remove.append(user.pk)
-        self.object.users_for_reminders.remove(*users_to_remove)
-        self.object.users_for_reminders.add(*users_to_add)
+        self.object.users_notification.remove(*users_to_remove)
+        self.object.users_notification.add(*users_to_add)
 
         messages.success(self.request, 'Barco atualizado com sucesso')
 
@@ -116,10 +118,11 @@ class BoatUpdateView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["boat_items"] = self.object.items.all().values_list('name', flat=True)
+        context["boat_users_notification"] = self.object.users_notification.all().values_list('username', flat=True)
         context["items"] = self.items
-        self.users_for_reminder = [owner for owner in self.object.get_owners() if owner is not None]
-        self.users_for_reminder.extend(list(User.objects.exclude(profile='SO')))
-        context['users_for_reminder'] = self.users_for_reminder
+        users_for_notification = [owner for owner in self.object.get_owners() if owner is not None]
+        users_for_notification.extend(list(User.objects.exclude(profile='SO')))
+        context['users_for_notification'] = users_for_notification
 
         return context
 
