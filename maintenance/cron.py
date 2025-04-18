@@ -8,6 +8,8 @@ def send_email_for_maintenances():
     print('Sending email for pending maintenance...')
     boat = Boat.objects.get(name='Blue Note')
     pending_maintenances = Maintenance.objects.filter(boat=boat, completed=False).order_by('due_date')
+    users_send_notification = boat.users_notification.all()
+    emails_send_notification = [user.email for user in users_send_notification]
     message = f'Veleiro {boat.name} -  manutenções pendentes:\n\n'
     for maintenance in pending_maintenances:
         message += f"manutenção: {maintenance.description}\n"
@@ -22,6 +24,6 @@ def send_email_for_maintenances():
         "Teste de email de manutenção - IGNORAR vai  receber a cada 3 horas",
         message,
         "mandaprohgf@gmail.com",
-        ["hgf777@gmail.com", "abelmferreira@gmail.com", "daniela@flipboatclub.com.br"],
+        emails_send_notification,
         fail_silently=False,
     )

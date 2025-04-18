@@ -57,9 +57,7 @@ class MaintenancesPendingTableView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.profile == 'SO':
-            print(self.request.user)
             boat_user = self.request.user.get_boat()
-            print(boat_user)
             return Maintenance.objects.filter(boat=boat_user, completed=False)
         return Maintenance.objects.filter(completed=False)
 
@@ -104,7 +102,6 @@ class MaintenanceUpdateView(LoginRequiredMixin, UpdateView):
 
 class MaintenanceDeleteView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        print('delete')
         try:
             maintenance = Maintenance.objects.get(pk=kwargs['pk'])
             maintenance.delete()
@@ -164,7 +161,6 @@ class MaintenanceSerializer(serializers.ModelSerializer):
         ret = super().to_representation(instance)
         ret['boat'] = instance.boat.name
         ret['technician'] = instance.technician.name
-        print(ret)
         return ret
 
 
@@ -247,7 +243,6 @@ class PeriodicSerializer(serializers.ModelSerializer):
         ret = super().to_representation(instance)
         ret['boat'] = instance.boat.name
         ret['periodicity_display'] = instance.get_periodicity_display()
-        print(ret)
         return ret
 
 

@@ -17,6 +17,9 @@ from .models import User
 from .forms import UserCreateForm, UserUpdateForm
 from boat_maintenance.mixins import UserNotShareOwner
 
+from pywa import WhatsApp
+from pywa.types import Template as Temp
+
 
 class UsersTableView(UserNotShareOwner, ListView):
     model = User
@@ -38,7 +41,7 @@ class UserCreateView(UserNotShareOwner, CreateView):
         return HttpResponseRedirect(self.success_url)
 
 
-class UserUpdateView(UserNotShareOwner, UpdateView):
+class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = UserUpdateForm
     template_name = "user/update_user.html"
@@ -91,9 +94,11 @@ class UserSendNewPasswordView(UserNotShareOwner, View):
 
 class TestSendEmailView(View):
     def get(self, request, *args, **kwargs):
-        print('Sending email for pending maintenance...')
+        print('Sending whatsapp for pending maintenance...')
         boat = Boat.objects.get(name='Blue Note')
         pending_maintenances = Maintenance.objects.filter(boat=boat, completed=False).order_by('due_date')
+        users_send_notification = boat.users_notification.all()
+        emails_send_notification = [user.email for user in users_send_notification]
         message = f'Veleiro {boat.name} -  manutenções pendentes:\n\n'
         for maintenance in pending_maintenances:
             message += f"manutenção: {maintenance.description}\n"
@@ -108,6 +113,49 @@ class TestSendEmailView(View):
             "Teste de email de manutenção",
             message,
             "mandaprohgf@gmail.com",
-            ["hgf777@gmail.com"],
+            emails_send_notification,
             fail_silently=False,
         )
+
+        return HttpResponseRedirect(reverse_lazy("user:table-users"))
+
+
+class TestSendWhatsappView(View):
+    def get(self, request, *args, **kwargs):
+        wa = WhatsApp(
+            phone_id="608083275721320",
+            token="EAAJALjDhCW4BO36DYwARFJdYAjeNi7k0qpcpnD2ZAkd74ZAF6ZAzQGgA8p6tv1ZBcYogHSvRNiIZABVLv9rDFxpMMkI80vFtKVY9MEXdOQYspB39bZCn6tLuZCwL5Tg4MUhzqVEC8c5PpCfavQ3bw7ZAlXjM9OIM6eyUanqyPg56sWEeArsRH13OIiTrmZCvYnKV6HWiWKXhJxlbGS5IZBwT0XOIZBOZARtMHIvOTZCspARZAY"
+        )
+
+        print('Sending whatsapp for pending maintenance...')
+        boat = Boat.objects.get(name='Blue Note')
+        pending_maintenances = Maintenance.objects.filter(boat=boat, completed=False).order_by('due_date')
+        users_send_notification = boat.users_notification.all()
+        phones_send_notification = [user.phone for user in users_send_notification]
+        message = f'Veleiro {boat.name} -  manutenções pendentes:\n\n'
+        for maintenance in pending_maintenances:
+            message += f"manutenção: {maintenance.description}\n"
+            message += f"data limite: {maintenance.due_date.strftime(r'%d/%m/%Y')}\n"
+            message += f"setor: {maintenance.get_sector_display()}\n"
+            if maintenance.schedule_date:
+                message += f"data agendada: {maintenance.schedule_date.strftime(r'%d/%m/%Y')}\n"
+                message += f"técnico: {maintenance.technician.name} - {maintenance.technician.phone}\n"
+            message += f"{'-' * 80}\n\n"
+
+        # Send messages to all recipients
+        for phone in phones_send_notification:
+            print(f'Sending whatsapp to {phone}...')
+            wa.send_template(
+                to=phone,
+                template=Temp(
+                    name="maintenance",
+                    language=Temp.Language.PORTUGUESE_BR,
+                    body=[
+                        Temp.TextValue(value='15/05/2025'),
+                        Temp.TextValue(value='Blue Note'),
+                        Temp.TextValue(value='Fernando'),
+                        Temp.TextValue(value='Troca do exaustor de popa'),
+                    ],
+                )
+            )
+        return HttpResponseRedirect(reverse_lazy("user:table-users"))

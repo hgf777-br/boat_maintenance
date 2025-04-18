@@ -1,45 +1,58 @@
 {% extends "partials/base_table.html" %}
 {% load static %}
+{% load boat_extras %}
 
 {% block extra_css %}
 <style>
     table a, button {
         opacity: 0.7;
     }
+    #toolbar {
+        opacity: 0.7;
+    }
 </style>
 {% endblock extra_css %}
 
 {% block content %}
-    <div class="row">
+    <div id="toolbar">
+        <a href="{% url 'maintenance:create-maintenance' %}" class="btn btn-primary">Nova Manutenção</a>
+    </div>
+    <div class="row align-items-end">
         <div class="col">
             <h3>Manutenções <span class="h6">pendentes</span></h3>
         </div>
         <div class="col-auto">
-            <a href="{% url 'maintenance:create-maintenance' %}" class="btn btn-primary btn-sm">Nova Manutenção</a>
+            <h5>{{ request.user|boat:'name'}}</h5>
         </div>
         <hr>
     </div>
     <table id="table"
         data-classes="table table-hover"
+        data-toolbar="#toolbar"
         data-pagination="true"
         data-search="true"
         data-sort-name="due_date"
         data-sort-order="asc"
+        data-detail-view="true"
+        data-detail-formatter="detailFormatter"
         data-show-pagination-switch="true"
         data-locale="pt-BR"
         data-mobile-responsive="true"
+        data-min-width=576
         data-check-on-init="true">
         <thead>
             <tr>
+                {% if request.user.profile != "SO" %}
                 <th data-field="name" data-sortable="true">barco</th>
+                {% endif %}
                 <th data-field="due_date" data-sortable="true" data-formatter="due_date_formatter" data-cell-style="due_date_style">data limite</th>
-                <th data_field="periodic" data-sortable="true" data-formatter="periodic_formatter">Periodicidade</th>
-                <th data-sortable="true">setor</th>
-                <th data-sortable="true">descrição</th>
-                <th data-sortable="true">responsável</th>
+                <th data-field="sector" data-sortable="true">setor</th>
+                <th data-field="description" data-sortable="true">descrição</th>
+                <th data-field="creator" data-sortable="true" data-visible="false">responsável</th>
+                <th data-field="periodic" data-sortable="true" data-formatter="periodic_formatter" data-visible="false">Periodicidade</th>
                 <th data-field="schedule_date" data-sortable="true" data-formatter="schedule_date_formatter" data-cell-style="schedule_date_style">data agendada</th>
-                <th data-sortable="true">tecnico</th>
-                <th data-sortable="true">observações</th>
+                <th data-field="technician" data-sortable="true">tecnico</th>
+                <th data-field="obs" data-sortable="true" data-visible="false">observações</th>
                 <th
                 data-sortable="false"
                 data-width="5"
@@ -50,17 +63,19 @@
         <tbody>
             {% for maintenance in maintenances_list %}
             <tr>
+                {% if request.user.profile != "SO" %}
                 <td>{{ maintenance.boat }}</td>
+                {% endif %}
                 <td>{{ maintenance.due_date|date:"Y-m-d" }}</td>
-                <td>{{ maintenance.periodic.get_periodicity_display }}</td>
                 <td>{{ maintenance.get_sector_display }}</td>
                 <td>{{ maintenance.description }}</td>
-                <td>{{ maintenance.creator }}</td>
+                <td>{{ maintenance.creator.get_full_name }}</td>
+                <td>{{ maintenance.periodic.get_periodicity_display }}</td>
                 <td>{{ maintenance.schedule_date|date:"Y-m-d" }}</td>
                 <td>{{ maintenance.technician|default:"" }}</td>
                 <td>{{ maintenance.obs }}</td>
                 <td>
-                    <div class="d-flex justify-content-center mt-3 mt-sm-0">
+                    <div class="d-flex justify-content-left justify-content-sm-center mt-3 mt-sm-0">
                         <button type="button" id="button-operation-{{ maintenance.id }}" class="btn btn-warning px-4 px-sm-1 me-3 me-sm-1 button-operation" title="operação">
                             <i class="bi bi-gear"></i>
                         </button>
@@ -81,9 +96,7 @@
 {% block extra_javascript %}
 <script src="{% static 'js/jquery.mask.min.js' %}" crossorigin="anonymous"></script>
 <script>
-    $(function() {
-        $('#table').bootstrapTable();
-    });
+    const table = $('#table');
 
     function date_style(date) {
         const today = new Date().setHours(0,0,0,0);
@@ -97,31 +110,6 @@
             column_class = "text-primary";
         }
         return {classes: column_class};
-    }
-
-    window.due_date_style = (value, row, index, field) => {
-        return date_style(value);
-    }
-
-    window.schedule_date_style = (value, row, index, field) => {
-        return date_style(value);
-    }
-
-    window.due_date_formatter = (value, row, index, field) => {
-        const dueDate = new Date(value + 'T00:00:00');
-        return dueDate.toLocaleDateString();
-    }
-
-    window.schedule_date_formatter = (value, row, index, field) => {
-        if (value == '') {
-            return '';
-        }
-        const scheduleDate = new Date(value + 'T00:00:00');
-        return scheduleDate.toLocaleDateString();
-    }
-
-    window.periodic_formatter = (value, row, index, field) => {
-        return value != '' ? value : 'pontual';
     }
 
     $(document).on('click', '.button-operation', function() {
@@ -319,5 +307,56 @@
             }
         });
     })
+
+    // Handlers for Bootstrap Table
+    window.due_date_style = (value, row, index, field) => {
+        return date_style(value);
+    }
+
+    window.schedule_date_style = (value, row, index, field) => {
+        return date_style(value);
+    }
+
+    window.due_date_formatter = (value, row, index, field) => {
+        const dueDate = new Date(value + 'T00:00:00');
+        return dueDate.toLocaleDateString();
+    }
+
+    window.schedule_date_formatter = (value, row, index, field) => {
+        if (value == '') {
+            return '';
+        }
+        const scheduleDate = new Date(value + 'T00:00:00');
+        return scheduleDate.toLocaleDateString();
+    }
+
+    window.periodic_formatter = (value, row, index, field) => {
+        return value != '' ? value : 'pontual';
+    }
+
+    window.detailFormatter = (index, row, element) => {
+        const periodic = row.periodic != '' ? row.periodic : 'pontual';
+        return `
+        <p class="mb-1"><b>responsável:</b> ${row.creator}</p>
+        <p class="mb-1"><b>periodicidade:</b> ${periodic}</p>
+        <p class="mb-1"><b>observações:</b> ${row.obs}</p>`
+    }
+
+    $(function() {
+        table.bootstrapTable({
+            onToggle: function (cardview) {
+                const windowWidth = $(window).width();
+                if (windowWidth < 576) {
+                    table.bootstrapTable('showColumn', 'periodic');
+                    table.bootstrapTable('showColumn', 'creator');
+                    table.bootstrapTable('showColumn', 'obs');
+                } else {
+                    table.bootstrapTable('hideColumn', 'periodic');
+                    table.bootstrapTable('hideColumn', 'creator');
+                    table.bootstrapTable('hideColumn', 'obs');
+                }
+            }
+        });
+    });
 </script>
 {% endblock extra_javascript %}

@@ -29,7 +29,6 @@
     {% endblock extra_css %}
     <script>
         // Check if dark mode is enabled
-        console.log('BASE')
         const html_element = document.getElementsByTagName('html')[0];
         if (html_element.getAttribute('data-bs-theme') == 'auto') {
             const windows_theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
