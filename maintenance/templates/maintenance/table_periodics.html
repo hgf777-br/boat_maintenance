@@ -1,26 +1,36 @@
 {% extends "partials/base_table.html" %}
 {% load static %}
+{% load boat_extras %}
 
 {% block extra_css %}
 <style>
     table a, button {
         opacity: 0.7;
     }
+    #toolbar {
+        opacity: 0.7;
+    }
 </style>
 {% endblock extra_css %}
 
 {% block content %}
+    <div id="toolbar">
+        <a href="{% url 'maintenance:create-periodic' %}" class="btn btn-primary">Nova Manutenção Periódica</a>
+    </div>
     <div class="row">
         <div class="col">
             <h3>Manutenções Periódicas</h3>
         </div>
+        {% if request.user.profile == 'SO' %}
         <div class="col-auto">
-            <a href="{% url 'maintenance:create-periodic' %}" class="btn btn-primary btn-sm">Nova Manutenção Periódica</a>
+            <h5>{{ request.user|boat:'name'}}</h5>
         </div>
+        {% endif %}
         <hr>
     </div>
     <table id="table"
         data-classes="table table-hover"
+        data-toolbar="#toolbar"
         data-pagination="true"
         data-search="true"
         data-sort-name="finish_date"

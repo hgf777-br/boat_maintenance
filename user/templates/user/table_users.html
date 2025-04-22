@@ -72,9 +72,27 @@
 {% block extra_javascript %}
 <script>
     const table = $('#table');
+    var pagination  = null;
 
     $(function() {
-        table.bootstrapTable();
+        table.bootstrapTable({
+            onToggle: function (cardview) {
+                const windowWidth = $(window).width();
+                if (windowWidth < 576) {
+                    if (pagination === null || pagination) {
+                        pagination = false;
+                        table.bootstrapTable('togglePagination');
+                    }
+                } else {
+                    if (pagination === null) {
+                        pagination = true;
+                    } else if (!pagination) {
+                        pagination = true;
+                        table.bootstrapTable('togglePagination');
+                    }
+                }
+            }
+        });
     });
 
     window.usernameFormatter = (value, row, index, field) => {

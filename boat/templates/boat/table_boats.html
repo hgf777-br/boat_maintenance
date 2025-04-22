@@ -7,6 +7,9 @@
     table a, button {
         opacity: 0.7;
     }
+    #toolbar {
+        opacity: 0.7;
+    }
 </style>
 {% endblock extra_css %}
 
@@ -18,9 +21,11 @@
         <div class="col">
             <h3>Barcos</h3>
         </div>
+        {% if request.user.profile == 'SO' %}
         <div class="col-auto">
             <h5>{{ request.user|boat:'name'}}</h5>
         </div>
+        {% endif %}
         <hr>
     </div>
     <table id="table"
@@ -60,9 +65,27 @@
 {% block extra_javascript %}
 <script>
     const table = $('#table');
+    var pagination = null;
 
     $(function() {
-        table.bootstrapTable();
+        table.bootstrapTable({
+            onToggle: function (cardview) {
+                const windowWidth = $(window).width();
+                if (windowWidth < 576) {
+                    if (pagination === null || pagination) {
+                        pagination = false;
+                        table.bootstrapTable('togglePagination');
+                    }
+                } else {
+                    if (pagination === null) {
+                        pagination = true;
+                    } else if (!pagination) {
+                        pagination = true;
+                        table.bootstrapTable('togglePagination');
+                    }
+                }
+            }
+        });
     });
 
     window.nameFormatter = (value, row, index, field) => {
