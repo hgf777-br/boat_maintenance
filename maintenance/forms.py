@@ -4,10 +4,10 @@ from .models import Maintenance, Periodic
 
 
 class MaintenanceForm(forms.ModelForm):
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['boat'].widget.attrs = {'class': 'form-select', 'placeholder': '#', 'autofocus':''}
+        self.fields['boat'].widget.attrs = {'class': 'form-select', 'placeholder': '#', 'autofocus': ''}
         self.fields['boat'].empty_label = None
         self.fields['sector'].widget.attrs = {'class': 'form-select', 'placeholder': '#'}
         self.fields['description'].widget.attrs = {'class': 'form-control', 'placeholder': '#'}
@@ -15,7 +15,7 @@ class MaintenanceForm(forms.ModelForm):
         self.fields['schedule_date'].widget.attrs = {'class': 'form-control', 'placeholder': '#'}
         self.fields['technician'].widget.attrs = {'class': 'form-select', 'placeholder': '#'}
         self.fields['technician'].empty_label = None
-        self.fields['obs'].widget.attrs = {'class': 'form-control', 'placeholder': '#', 'style': 'height: 100px'} 
+        self.fields['obs'].widget.attrs = {'class': 'form-control', 'placeholder': '#', 'style': 'height: 100px'}
 
     class Meta:
         model = Maintenance
@@ -28,13 +28,16 @@ class MaintenanceForm(forms.ModelForm):
             'technician',
             'obs'
         )
+        widgets = {
+            'due_date': forms.TextInput(attrs={'type': 'date'}),
+        }
 
 
 class PeriodicForm(forms.ModelForm):
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['boat'].widget.attrs = {'class': 'form-select', 'placeholder': '#', 'autofocus':''}
+        self.fields['boat'].widget.attrs = {'class': 'form-select', 'placeholder': '#', 'autofocus': ''}
         self.fields['boat'].empty_label = None
         self.fields['sector'].widget.attrs = {'class': 'form-select', 'placeholder': '#'}
         self.fields['periodicity'].widget.attrs = {'class': 'form-select', 'placeholder': '#'}

@@ -24,5 +24,12 @@ def not_in_list(value, list):
     return value not in list
 
 
+def technician_full_name(technician):
+    if technician:
+        return f"{technician.name} - {technician.company}"
+    return ""
+
+
 register.filter("boat", boat_from_user)
 register.filter("not_in_list", not_in_list)
+register.filter("technician_full_name", technician_full_name)

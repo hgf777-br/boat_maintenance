@@ -1,24 +1,24 @@
 import json
+
+from django.contrib import messages
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, View
-from django.http import HttpResponseRedirect, JsonResponse
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import CreateView, UpdateView
-from django.contrib.auth.hashers import make_password
-from django.contrib import messages
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import send_mail
-
-from boat.models import Boat
-from maintenance.models import Maintenance
-
-from .models import User
-from .forms import UserCreateForm, UserUpdateForm
-from boat_maintenance.mixins import UserNotShareOwner
-
 from pywa import WhatsApp
 from pywa.types import Template as Temp
+
+from boat.models import Boat
+from boat_maintenance.mixins import UserNotShareOwner
+from maintenance.models import Maintenance
+
+from .forms import UserCreateForm, UserUpdateForm
+from .models import User
 
 
 class UsersTableView(UserNotShareOwner, ListView):

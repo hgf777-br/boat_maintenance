@@ -3,7 +3,7 @@
 {% load static %}
 {% load boat_extras %}
 {% block extra_css%}
-<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/css/datepicker.min.css'>   
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/css/datepicker.min.css'>
 {% endblock extra_css%}
 
 {% block content %}
@@ -87,14 +87,14 @@
         // Fetch all the forms we want to apply custom Bootstrap validation styles to
         const forms = document.querySelectorAll('.needs-validation')
         const due_date = document.getElementById('id_due_date');
-        const date_picker = new Datepicker(due_date, {
+        {% comment %} const date_picker = new Datepicker(due_date, {
             'format': 'dd/mm/yyyy', // BR format
             'language': 'pt-BR', // PT-BR language
             'todayButton': true,
             'todayHighlight': true, // Highlight today's date
             'autohide': true, // Automatically close the datepicker
-        });
-        
+        }); {% endcomment %}
+
         // Loop over them and prevent submission
         Array.from(forms).forEach(form => {
             form.addEventListener('submit', event => {

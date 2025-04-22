@@ -1,5 +1,6 @@
 {% extends "partials/base_table.html" %}
 {% load static %}
+{% load boat_extras %}
 
 {% block extra_css %}
 <style>
@@ -10,53 +11,49 @@
 {% endblock extra_css %}
 
 {% block content %}
+    <div id="toolbar">
+        <a href="{% url 'technician:create-technician' %}" class="btn btn-primary">Novo Técnico</a>
+    </div>
     <div class="row">
         <div class="col">
             <h3>Técnicos</h3>
         </div>
+        {% if request.user.profile == 'SO' %}
         <div class="col-auto">
-            <a href="{% url 'technician:create-technician' %}" class="btn btn-primary btn-sm">Novo Técnico</a>
+            <h5>{{ request.user|boat:'name'}}</h5>
         </div>
+        {% endif %}
         <hr>
     </div>
     <table id="table"
         data-classes="table table-hover"
+        data-toolbar="#toolbar"
         data-pagination="true"
         data-search="true"
         data-show-pagination-switch="true"
         data-locale="pt-BR"
         data-mobile-responsive="true"
+        data-min-width=576
         data-check-on-init="true">
         <thead>
             <tr>
-                <th data-sortable="true">nome</th>
-                <th data-sortable="true">email</th>
-                <th data-sortable="true">telefone</th>
-                <th data-sortable="true">especialidade</th>
-                <th
-                data-sortable="false"
-                data-width="5"
-                data-width-unit="%">
-                </th>
+                <th data-field="name" data-sortable="true" data-formatter="nameFormatter">nome</th>
+                <th data-field="speciality" data-sortable="true">especialidade</th>
+                <th data-field="email" data-sortable="true">email</th>
+                <th data-field="phone" data-sortable="true" data-formatter="phoneFormatter">telefone</th>
+                <th data-field="company" data-sortable="true">empresa</th>
+                <th data-field="id" data-sortable="false" data-width="5" data-width-unit="%" data-formatter="idFormatter"></th>
             </tr>
         </thead>
         <tbody>
             {% for technician in technicians_list %}
             <tr>
                 <td>{{ technician.name }}</td>
+                <td>{{ technician.get_speciality_display }}</td>
                 <td>{{ technician.email }}</td>
                 <td>{{ technician.phone }}</td>
-                <td>{{ technician.get_speciality_display }}</td>
-                <td>
-                    <div class="d-flex justify-content-center mt-3 mt-sm-0">
-                        <a href="update/{{ technician.id }}" class="btn btn-primary px-4 px-sm-1 me-3 me-sm-2" title="editar" id="update-{{ technician.id }}">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        <button type="button" id="new-password-{{ technician.id }}" class="btn btn-danger px-4 px-sm-1 me-3 me-sm-2 button-delete" title="criar nova senha">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                </td>
+                <td>{{ technician.company }}</td>
+                <td>{{ technician.id }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -65,14 +62,36 @@
 
 {% block extra_javascript %}
 <script>
+    const table = $('#table');
+
     $(function() {
-        $('#table').bootstrapTable();
+        table.bootstrapTable();
     });
 
+    window.phoneFormatter = (value, row, index, field) => {
+        return `(${value.substr(0, 2)})${value.substr(2, 5)}-${value.substr(7)}`
+    }
+
+    window.nameFormatter = (value, row, index, field) => {
+        return `<spam id="name-${row.id}">${value}</spam>`
+    }
+
+    window.idFormatter = (value, row, index, field) => {
+        return `
+        <div class="d-flex justify-content-center mt-3 mt-sm-0">
+            <a href="update/${value}" class="btn btn-primary px-4 px-sm-1 me-3 me-sm-2" title="editar" id="update-${value}">
+                <i class="bi bi-pencil"></i>
+            </a>
+            <button type="button" id="delete-${value}" class="btn btn-danger px-4 px-sm-1 me-3 me-sm-2 button-delete" title="criar nova senha">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>`
+    }
+
+
     $(document).on('click', '.button-delete', function() {
-        const id = $(this).attr('id').split('-')[2];
-        const table_line = $(this).closest('tr');
-        const name = table_line.find("td:eq(0)").text();
+        const id = $(this).attr('id').split('-')[1];
+        const name = $(`#name-${id}`).text();
         Swal.fire({
             title: "Você tem certeza?",
             text: `você vai apagar o técnico: ${name}`,
@@ -101,7 +120,9 @@
                             background: "#B0FFB0",
                         });
                         // Atualizar a lista de usuários após a exclusão
-                        table_line.remove();
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
                     } else {
                         Toast.fire({
                             icon: "error",

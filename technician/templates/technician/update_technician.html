@@ -39,6 +39,12 @@
                 <label for="speciality" class="form-label">{{ form.speciality.label }}</label>
             </div>
         </div>
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.company }}
+                <label for="company" class="form-label">{{ form.company.label }}</label>
+            </div>
+        </div>
     </div>
     <hr>
     <div class="row">
@@ -62,7 +68,7 @@
         const form = document.querySelector('.needs-validation')
         const phone = document.getElementById('id_phone');
         const phone_mask = IMask(phone, {mask: '(00)00000-0000'})
-        
+
         // Loop over them and prevent submission
         Array.from(forms).forEach(form => {
             form.addEventListener('submit', event => {
@@ -70,16 +76,13 @@
                     console.log('erro')
                     event.preventDefault();
                     event.stopPropagation();
+                } else {
+                    phone.value = phone_mask.unmaskedValue;
                 }
                 form.classList.add('was-validated');
             }, false)
         })
 
-        form.addEventListener('submit', event => {
-            event.preventDefault();
-            phone.value = phone_mask.unmaskedValue;
-            form.submit();
-        })
     })()
 </script>
 {% endblock extra_javascript %}

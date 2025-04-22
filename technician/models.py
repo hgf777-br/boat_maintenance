@@ -18,8 +18,9 @@ class Technician(models.Model):
     email = models.EmailField(max_length=256, verbose_name=_("email"))
     speciality = models.CharField(max_length=2, choices=Specialities, verbose_name=_("speciality"),
                                   blank=False, default=Specialities.MECHANIC,)
+    company = models.CharField(max_length=64, verbose_name=_("company"), default="Autônomo")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("created at"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("updated at"))
 
     def __str__(self):
-        return self.name
+        return f"{self.name} - {self.company}"

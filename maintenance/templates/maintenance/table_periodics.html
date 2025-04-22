@@ -31,12 +31,12 @@
         data-check-on-init="true">
         <thead>
             <tr>
-                <th data-sortable="true">barco</th>
-                <th data-sortable="true">setor</th>
-                <th data-sortable="true">Periodicidade</th>
-                <th data-sortable="true">descrição</th>
-                <th data-sortable="true">responsável</th>
-                <th data-sortable="false"></th>
+                <th data-field="boat" data-sortable="true">barco</th>
+                <th data-field="sector" data-sortable="true">setor</th>
+                <th data-field="periodicity" data-sortable="true">Periodicidade</th>
+                <th data-field="description" data-sortable="true">descrição</th>
+                <th data-field="creator" data-sortable="true">responsável</th>
+                <th data-field="id" data-sortable="false" data-formatter="id_formatter"></th>
             </tr>
         </thead>
         <tbody>
@@ -47,19 +47,7 @@
                 <td>{{ periodic.get_periodicity_display }}</td>
                 <td>{{ periodic.description }}</td>
                 <td>{{ periodic.creator }}</td>
-                <td>
-                    <div class="d-flex justify-content-center mt-3 mt-sm-0">
-                        <button type="button" id="button-info-{{ periodic.id }}" class="btn btn-info px-4 px-sm-1 me-3 me-sm-1 button-info" title="operação">
-                            <i class="bi bi-info-lg"></i>
-                        </button>
-                        <a href="update/{{ periodic.id }}" class="btn btn-primary px-4 px-sm-1 me-3 me-sm-1" title="editar" id="update-{{ periodic.id }}">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        <button type="button" id="button-delete-{{ periodic.id }}" class="btn btn-danger px-4 px-sm-1 me-3 me-sm-1 button-delete" title="criar nova senha">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                </td>
+                <td>{{ periodic.id }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -68,6 +56,23 @@
 
 {% block extra_javascript %}
 <script>
+    const table = $('#table');
+
+    window.id_formatter = (value, row, index, field) => {
+        return `
+        <div class="d-flex justify-content-center mt-3 mt-sm-0">
+            <button type="button" id="button-info-${value}" class="btn btn-info px-4 px-sm-1 me-3 me-sm-1 button-info" title="operação">
+                <i class="bi bi-info-lg"></i>
+            </button>
+            <a href="update/${value}" class="btn btn-primary px-4 px-sm-1 me-3 me-sm-1" title="editar" id="update-${value}">
+                <i class="bi bi-pencil"></i>
+            </a>
+            <button type="button" id="button-delete-${value}" class="btn btn-danger px-4 px-sm-1 me-3 me-sm-1 button-delete" title="criar nova senha">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>`
+    }
+
     $(function() {
         $('#table').bootstrapTable();
     });
@@ -143,7 +148,9 @@
                             background: "#B0FFB0",
                         });
                         // Atualizar a lista de usuários após a exclusão
-                        table_line.remove();
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
                     } else {
                         Toast.fire({
                             icon: "error",

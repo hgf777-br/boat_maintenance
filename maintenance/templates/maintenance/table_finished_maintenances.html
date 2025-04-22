@@ -28,13 +28,13 @@
         data-check-on-init="true">
         <thead>
             <tr>
-                <th data-sortable="true">barco</th>
+                <th data-field="boat" data-sortable="true">barco</th>
                 <th data-field="finish_date" data-sortable="true" data-formatter="finish_date_formatter">data finalização</th>
-                <th data-sortable="true">setor</th>
-                <th data-sortable="true">descrição</th>
-                <th data-sortable="true">responsável</th>
-                <th data-sortable="true">tecnico</th>
-                <th data-sortable="false"></th>
+                <th data-field="sector" data-sortable="true">setor</th>
+                <th data-field="description" data-sortable="true">descrição</th>
+                <th data-field="creator" data-sortable="true">responsável</th>
+                <th data-field="technician" data-sortable="true">tecnico</th>
+                <th data-field="id" data-sortable="false" data-formatter="id_formatter"></th>
             </tr>
         </thead>
         <tbody>
@@ -46,13 +46,7 @@
                 <td>{{ maintenance.description }}</td>
                 <td>{{ maintenance.creator }}</td>
                 <td>{{ maintenance.technician|default:"" }}</td>
-                <td>
-                    <div class="d-flex justify-content-center mt-3 mt-sm-0">
-                        <button type="button" id="button-info-{{ maintenance.id }}" class="btn btn-info px-4 px-sm-1 me-3 me-sm-1 button-info" title="informação">
-                            <i class="bi bi-info-lg"></i>
-                        </button>
-                    </div>
-                </td>
+                <td>{{ maintenance.id}}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -61,14 +55,28 @@
 
 {% block extra_javascript %}
 <script>
-    $(function() {
-        $('#table').bootstrapTable();
-    });
+    const table = $('#table');
+
+    window.id_formatter = (value, row, index, field) => {
+        return `
+        <div class="d-flex justify-content-center mt-3 mt-sm-0">
+            <button type="button" id="button-info-${value}" class="btn btn-info px-4 px-sm-1 me-3 me-sm-1 button-info" title="informação">
+                <i class="bi bi-info-lg"></i>
+            </button>
+            <button type="button" id="button-delete-${value}" class="btn btn-danger px-4 px-sm-1 me-3 me-sm-1 button-delete" title="criar nova senha">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>`
+    }
 
     window.finish_date_formatter = (value, row, index, field) => {
         const dueDate = new Date(value + 'T00:00:00');
         return dueDate.toLocaleDateString();
     }
+
+    $(function() {
+        table.bootstrapTable();
+    });
 
     $(document).on('click', '.button-info', function() {
         const id = $(this).attr('id').split('-')[2];
@@ -100,6 +108,57 @@
                 },
                 loaderHtml: '<div class="spinner-border text-primary"></div>',
             });
+        });
+    })
+
+    $(document).on('click', '.button-delete', function() {
+        /**
+         * Shows a modal confirmation alert and them send an AJAX requisition
+         * to delete a maintenance from the system.
+         */
+        const id = $(this).attr('id').split('-')[2];
+        const description = $(`#description-${id}`).text();
+        Swal.fire({
+            title: "Você tem certeza?",
+            text: `você vai apagar a manutenção: ${description}`,
+            icon: "warning",
+            theme: '{{ request.user.get_theme_display }}',
+            buttonsStyling: false,
+            showCancelButton: true,
+            confirmButtonText: "apagar",
+            customClass: {
+                confirmButton: 'btn btn-success btn-lg me-2',
+                cancelButton: 'btn btn-danger btn-lg',
+                loader: 'custom-loader',
+            },
+            loaderHtml: '<div class="spinner-border text-primary"></div>',
+        })
+        .then((result) => {
+            if (result.isConfirmed) {
+                const url = "{% url 'maintenance:delete-maintenance' 1 %}".replace('1', id);
+                fetch(url, {method: "GET",})
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        Toast.fire({
+                            icon: "success",
+                            title: data.message,
+                            background: "#B0FFB0",
+                        });
+                        // Atualizar a lista de usuários após a exclusão
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        Toast.fire({
+                            icon: "error",
+                            title: data.message,
+                            background: "#FFB0B0",
+                        });
+                    }
+                    })
+                .catch(error => console.error(error));
+            }
         });
     })
 </script>

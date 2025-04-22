@@ -3,7 +3,7 @@
 {% load static %}
 {% load boat_extras %}
 {% block extra_css%}
-<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/css/datepicker.min.css'>   
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/css/datepicker.min.css'>
 {% endblock extra_css%}
 
 {% block content %}
@@ -71,7 +71,7 @@
     <div class="row">
         <div class="col">
             <div class="float-end mb-3 me-2">
-                <button type="submit" class="btn btn-outline-success">Cadastrar</button>
+                <button type="submit" class="btn btn-outline-success">Alterar</button>
                 <a href="{% url 'maintenance:table-periodics' %}" class="btn btn-outline-danger ms-2">Cancelar</a>
             </div>
         </div>
@@ -103,7 +103,7 @@
         change_validity(periodicity_day, validity);
         return validity
     }
-    
+
     function check_periodicity_week_day_validity(periodicity_week_day, periodicity) {
         validity = !CODES_WEEK_DAY.includes(periodicity.value) || (CODES_WEEK_DAY.includes(periodicity.value) && periodicity_week_day.value!= '');
         console.log('week', validity, periodicity.value)
@@ -159,7 +159,7 @@
         // Display right fields
         display_fields_by_periodicity(periodicity.value)
 
-        
+
         // Loop over them and prevent submission
         Array.from(forms).forEach(form => {
             form.addEventListener('submit', event => {
