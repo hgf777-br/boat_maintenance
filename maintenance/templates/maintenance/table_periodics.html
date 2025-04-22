@@ -25,7 +25,6 @@
         data-search="true"
         data-sort-name="finish_date"
         data-sort-order="asc"
-        data-show-pagination-switch="true"
         data-locale="pt-BR"
         data-mobile-responsive="true"
         data-check-on-init="true">
@@ -57,6 +56,7 @@
 {% block extra_javascript %}
 <script>
     const table = $('#table');
+    var pagination = null;
 
     window.id_formatter = (value, row, index, field) => {
         return `
@@ -74,7 +74,24 @@
     }
 
     $(function() {
-        $('#table').bootstrapTable();
+        table.bootstrapTable({
+            onToggle: function (cardview) {
+                const windowWidth = $(window).width();
+                if (windowWidth < 576) {
+                    if (pagination === null || pagination) {
+                        pagination = false;
+                        table.bootstrapTable('togglePagination');
+                    }
+                } else {
+                    if (pagination === null) {
+                        pagination = true;
+                    } else if (!pagination) {
+                        pagination = true;
+                        table.bootstrapTable('togglePagination');
+                    }
+                }
+            }
+        });
     });
 
     $(document).on('click', '.button-info', function() {

@@ -1,20 +1,28 @@
 {% load i18n %}
 {% load static %}
-<header class="d-flex flex-wrap justify-content-center py-3 mb-2 border-bottom">
-    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+<header class="d-flex flex-wrap justify-content-between py-3 mb-2 border-bottom">
+    <a href="/" class="d-flex align-items-center link-body-emphasis text-decoration-none">
         <img src="{% static 'images/logo_blue_note_org.png' %}" width="80px"/>
     </a>
 
     <ul class="nav">
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">ocorrência</a>
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                <i class="bi bi-card-checklist d-sm-none fs-2"></i>
+                <spam class="d-none d-sm-inline">ocorrência</spam>
+            </a>
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="#">pontual</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#">checkin</a></li>
                 <li><a class="dropdown-item" href="#">checkout</a></li>
             </ul>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">manutenção</a>
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                <i class="bi bi-wrench-adjustable d-sm-none fs-2"></i>
+                <spam class="d-none d-sm-inline">manutenção</spam>
+            </a>
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="{% url 'maintenance:table-pending-maintenances' %}">pendentes</a></li>
                 <li><a class="dropdown-item" href="{% url 'maintenance:table-finished-maintenances' %}">finalizadas</a></li>
@@ -23,7 +31,10 @@
         </li>
         {% if request.user.profile != "SO" %}
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">cadastro</a>
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                <i class="bi bi-database-fill-gear d-sm-none fs-2"></i>
+                <spam class="d-none d-sm-inline">cadastro</spam>
+            </a>
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="{% url 'user:table-users' %}">usuários</a></li>
                 <li><a class="dropdown-item" href="{% url 'technician:table-technicians' %}">técnicos</a></li>
@@ -33,7 +44,10 @@
         </li>
         {% endif %}
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle"  data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">{{ request.user }}</a>
+            <a class="nav-link dropdown-toggle"  data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                <i class="bi bi-person-circle d-sm-none fs-2"></i>
+                <spam class="d-none d-sm-inline">{{ request.user }}</spam>
+            </a>
             <ul class="dropdown-menu">
                 <li><h6 class="dropdown-header">{{ request.user.get_profile_display }}</h6></li>
                 <li>

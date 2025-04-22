@@ -37,7 +37,6 @@
         data-sort-order="asc"
         data-detail-view="true"
         data-detail-formatter="detail_formatter"
-        data-show-pagination-switch="true"
         data-locale="pt-BR"
         data-mobile-responsive="true"
         data-min-width=576
@@ -83,6 +82,7 @@
 <script src="{% static 'js/jquery.mask.min.js' %}" crossorigin="anonymous"></script>
 <script>
     const table = $('#table');
+    var pagination = null;
 
     function date_style(date) {
         /**
@@ -167,10 +167,20 @@
                     table.bootstrapTable('showColumn', 'periodic');
                     table.bootstrapTable('showColumn', 'creator');
                     table.bootstrapTable('showColumn', 'obs');
+                    if (pagination === null || pagination) {
+                        pagination = false;
+                        table.bootstrapTable('togglePagination');
+                    }
                 } else {
                     table.bootstrapTable('hideColumn', 'periodic');
                     table.bootstrapTable('hideColumn', 'creator');
                     table.bootstrapTable('hideColumn', 'obs');
+                    if (pagination === null) {
+                        pagination = true;
+                    } else if (!pagination) {
+                        pagination = true;
+                        table.bootstrapTable('togglePagination');
+                    }
                 }
             }
         });
