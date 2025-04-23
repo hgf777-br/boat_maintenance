@@ -49,7 +49,6 @@ class MaintenancesPendingTableView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print(self)
         technicians = json.dumps(
             [{'id': technician.id, 'name': f'{technician.name} - {technician.company}'}
              for technician in Technician.objects.all()]
@@ -84,7 +83,6 @@ class MaintenanceCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy("maintenance:table-pending-maintenances")
 
     def form_valid(self, form):
-        print(form.cleaned_data)
         maintenance = form.save(commit=False)
         maintenance.creator = self.request.user
         maintenance.save()
@@ -99,7 +97,6 @@ class MaintenanceUpdateView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy("maintenance:table-pending-maintenances")
 
     def form_valid(self, form):
-        print(form.cleaned_data)
         messages.success(self.request, 'Manutenção atualizada com sucesso')
         return super().form_valid(form)
 

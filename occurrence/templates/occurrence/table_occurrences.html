@@ -1,0 +1,301 @@
+{% extends "partials/base_table.html" %}
+{% load static %}
+{% load boat_extras %}
+
+{% block extra_css %}
+<style>
+    table a, button {
+        opacity: 0.7;
+    }
+    #toolbar {
+        opacity: 0.7;
+    }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+    <div id="toolbar">
+        <a href="{% url 'occurrence:create-occurrence' %}" class="btn btn-primary">Nova Ocorrência</a>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h3>Ocorrências</h3>
+        </div>
+        {% if request.user.profile == 'SO' %}
+        <div class="col-auto">
+            <h5>{{ request.user|boat:'name'}}</h5>
+        </div>
+        {% endif %}
+        <hr>
+    </div>
+    <table id="table"
+        data-classes="table table-hover"
+        data-toolbar="#toolbar"
+        data-pagination="true"
+        data-search="true"
+        data-sort-name="finish_date"
+        data-sort-order="asc"
+        data-detail-view="true"
+        data-detail-formatter="detail_formatter"
+        data-locale="pt-BR"
+        data-mobile-responsive="true"
+        data-min-width=576
+        data-check-on-init="true">
+        <thead>
+            <tr>
+                {% if request.user.profile != "SO" %}
+                <th data-field="boat" data-sortable="true">barco</th>
+                {% endif %}
+                <th data-field="date" data-sortable="true" data-formatter="date_formatter">data</th>
+                <th data-field="sector" data-sortable="true">setor</th>
+                <th data-field="description" data-sortable="true">descrição</th>
+                <th data-field="creator" data-sortable="true" data-visible="false">responsável</th>
+                <th data-field="maintenance" data-sortable="true" data-visible="false" data-formatter="maintenance_formatter">manutenção</th>
+                <th data-field="engine_hours" data-sortable="true" data-visible="false">hora do motor</th>
+                <th data-field="obs" data-sortable="true" data-visible="false">observação</th>
+                <th data-field="id" data-sortable="false" data-formatter="id_formatter"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for occurrence in occurrences_list %}
+            <tr>
+                {% if request.user.profile != "SO" %}
+                <td>{{ occurrence.boat }}</td>
+                {% endif %}
+                <td>{{ occurrence.date|date:"Y-m-d" }}</td>
+                <td>{{ occurrence.get_sector_display }}</td>
+                <td>{{ occurrence.description }}</td>
+                <td>{{ occurrence.creator.get_full_name }}</td>
+                <td>{{ occurrence.maintenance }}</td>
+                <td>{{ occurrence.engine_hours }}</td>
+                <td>{{ occurrence.obs }}</td>
+                <td>{{ occurrence.id }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}
+
+{% block extra_javascript %}
+<script>
+    const table = $('#table');
+    var pagination = null;
+
+    window.date_formatter = (value, row, index, field) => {
+        const date = new Date(value + 'T00:00:00');
+        return `<spam id="due_date-${row.id}">${date.toLocaleDateString()}</spam>`;
+    }
+
+    window.maintenance_formatter = (value, row, index, field) => {
+        const maintenance = value === 'None' ? '' : value
+        return `<spam id="maintenance-${row.id}">${maintenance}</spam>`;
+    }
+
+    window.id_formatter = (value, row, index, field) => {
+        return `
+        <div class="d-flex justify-content-center mt-3 mt-sm-0">
+            <button type="button" id="button-maintenance-${value}-${index}" class="btn btn-warning px-4 px-sm-1 me-3 me-sm-1
+            button-maintenance" title="gerar manutenção" ${row.maintenance === 'None' ? '' : 'disabled'}>
+                <i class="bi bi-wrench-adjustable"></i>
+            </button>
+            <a href="update/${value}" class="btn btn-primary px-4 px-sm-1 me-3 me-sm-1" title="editar ocorrência" id="update-${value}">
+                <i class="bi bi-pencil"></i>
+            </a>
+            <button type="button" id="button-delete-${value}-${index}" class="btn btn-danger px-4 px-sm-1 me-3 me-sm-1 button-delete" title="apagar ocorrência">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>`
+    }
+
+    window.detail_formatter = (index, row, element) => {
+        const maintenance = row.maintenance === 'None' ? '' : row.maintenance
+        return `
+        <p class="mb-1"><b>responsável:</b> ${row.creator}</p>
+        <p class="mb-1"><b>manutenção:</b> ${maintenance}</p>
+        <p class="mb-1"><b>hora do motor:</b> ${row.engine_hours}</p>
+        <p class="mb-1"><b>observações:</b> ${row.obs}</p>`
+    }
+
+    $(function() {
+        table.bootstrapTable({
+            onToggle: function (cardview) {
+                const windowWidth = $(window).width();
+                if (windowWidth < 576) {
+                    table.bootstrapTable('showColumn', 'creator');
+                    table.bootstrapTable('showColumn', 'maintenance');
+                    table.bootstrapTable('showColumn', 'engine_hours');
+                    table.bootstrapTable('showColumn', 'obs');
+                    if (pagination === null || pagination) {
+                        pagination = false;
+                        table.bootstrapTable('togglePagination');
+                    }
+                } else {
+                    table.bootstrapTable('hideColumn', 'creator');
+                    table.bootstrapTable('hideColumn', 'maintenance');
+                    table.bootstrapTable('hideColumn', 'engine_hours');
+                    table.bootstrapTable('hideColumn', 'obs');
+                    if (pagination === null) {
+                        pagination = true;
+                    } else if (!pagination) {
+                        pagination = true;
+                        table.bootstrapTable('togglePagination');
+                    }
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '.button-maintenance', function() {
+        /**
+         * Shows a modal to enter a date and them send an AJAX requisition
+         * to create a new maintenance based on this occurrence and the date entered.
+         */
+        const id = $(this).attr('id').split('-')[2];
+        const index = $(this).attr('id').split('-')[3];
+        const row = table.bootstrapTable('getData')[index];
+        const description = row.description;
+        const sector = row.sector;
+        const obs = row.obs;
+        let boat = row.boat;
+        if (!boat) {
+            boat = "{{ request.user|boat:'name' }}";
+        }
+        console.log(boat)
+        const maintenance = row.maintenance;
+        Swal.fire({
+            titleText: "Criar Manutenção",
+            theme: "{{ request.user.get_theme_display }}",
+            buttonsStyling: false,
+            showCancelButton: true,
+            confirmButtonText: "criar",
+            cancelButtonText: "cancelar",
+            customClass: {
+                confirmButton: 'btn btn-success btn-lg me-2',
+                cancelButton: 'btn btn-danger btn-lg',
+                loader: 'custom-loader',
+            },
+            loaderHtml: '<div class="spinner-border text-primary"></div>',
+            html:`
+            {% csrf_token %}
+            <div id="html_content"></div>
+            `,
+            willOpen: function() {
+                const html_content = $('#html_content');
+                let content = '';
+                content = `
+                    <p>A manutenção será criada a partir da ocorrência <b>${description}</b> e a data limite abaixo:</p>
+                    <div class="form-floating">
+                        <input type="date" name="due_date" class="form-control" id="id_due_date">
+                        <label for="due_date" class="form-label">data limite</label>
+                    </div>
+                    `
+                html_content.html(content);
+            },
+            preConfirm: function() {
+                let due_date = $('#id_due_date').val();
+                if (!due_date) {
+                    Swal.showValidationMessage("Por favor, preencha a data limite.");
+                    Swal.enableButtons();
+                    return false;
+                }
+                return { due_date };
+            },
+            didOpen: function() {
+            },
+        }).then(function(result) {
+                if (result.isConfirmed) {
+                    const url = "{% url 'occurrence:create-maintenance-occurrence' %}";
+                    const body = {
+                        due_date: result.value.due_date,
+                        description: description,
+                        sector: sector,
+                        obs: obs,
+                        boat: boat,
+                        occurrence_id: id,
+                    }
+                    fetch(url, {
+                        method: "POST",
+                        body: JSON.stringify(body),
+                        headers: {
+                            "Content-type": "application/json; charset=UTF-8",
+                            "X-CSRFToken": "{{csrf_token}}"
+                        },
+                        credentials: 'same-origin',})
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'ok') {
+                            Toast.fire({
+                                icon: "success",
+                                title: data.message,
+                                background: "#B0FFB0",
+                            });
+                        } else {
+                            Toast.fire({
+                                icon: "error",
+                                title: data.message,
+                                background: "#FFB0B0",
+                            });
+                        }
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    })
+                    .catch(error => console.error(error));
+                }
+        })
+    });
+
+    $(document).on('click', '.button-delete', function() {
+        /**
+         * Shows a modal confirmation alert and them send an AJAX requisition
+         * to delete a maintenance from the system.
+         */
+        const id = $(this).attr('id').split('-')[2];
+        const index = $(this).attr('id').split('-')[3];
+        const row = table.bootstrapTable('getData')[index];
+        const description = row.description;
+        Swal.fire({
+            title: "Você tem certeza?",
+            html: `você vai apagar a ocorrência:<br><b>${description}</b>`,
+            icon: "warning",
+            theme: '{{ request.user.get_theme_display }}',
+            buttonsStyling: false,
+            showCancelButton: true,
+            confirmButtonText: "apagar",
+            customClass: {
+                confirmButton: 'btn btn-success btn-lg me-2',
+                cancelButton: 'btn btn-danger btn-lg',
+                loader: 'custom-loader',
+            },
+            loaderHtml: '<div class="spinner-border text-primary"></div>',
+        })
+        .then((result) => {
+            if (result.isConfirmed) {
+                const url = "{% url 'occurrence:delete-occurrence' 1 %}".replace('1', id);
+                fetch(url, {method: "GET",})
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        Toast.fire({
+                            icon: "success",
+                            title: data.message,
+                            background: "#B0FFB0",
+                        });
+                        // Atualizar a lista de ocorrências após a exclusão
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        Toast.fire({
+                            icon: "error",
+                            title: data.message,
+                            background: "#FFB0B0",
+                        });
+                    }
+                    })
+                .catch(error => console.error(error));
+            }
+        });
+    })
+</script>
+{% endblock extra_javascript %}

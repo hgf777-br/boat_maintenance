@@ -17,7 +17,7 @@
     <div id="toolbar">
         <a href="{% url 'maintenance:create-periodic' %}" class="btn btn-primary">Nova Manutenção Periódica</a>
     </div>
-    <div class="row">
+    <div class="row align-items-end">
         <div class="col">
             <h3>Manutenções Periódicas</h3>
         </div>
@@ -33,17 +33,19 @@
         data-toolbar="#toolbar"
         data-pagination="true"
         data-search="true"
-        data-sort-name="finish_date"
+        data-sort-name="sector"
         data-sort-order="asc"
         data-locale="pt-BR"
         data-mobile-responsive="true"
         data-check-on-init="true">
         <thead>
             <tr>
+                {% if request.user.profile != "SO" %}
                 <th data-field="boat" data-sortable="true">barco</th>
+                {% endif %}
                 <th data-field="sector" data-sortable="true">setor</th>
                 <th data-field="periodicity" data-sortable="true">Periodicidade</th>
-                <th data-field="description" data-sortable="true">descrição</th>
+                <th data-field="description" data-sortable="true" data-formatter="description_formatter">descrição</th>
                 <th data-field="creator" data-sortable="true">responsável</th>
                 <th data-field="id" data-sortable="false" data-formatter="id_formatter"></th>
             </tr>
@@ -51,7 +53,9 @@
         <tbody>
             {% for periodic in periodics_list %}
             <tr>
+                {% if request.user.profile != "SO" %}
                 <td>{{ periodic.boat }}</td>
+                {% endif %}
                 <td>{{ periodic.get_sector_display }}</td>
                 <td>{{ periodic.get_periodicity_display }}</td>
                 <td>{{ periodic.description }}</td>
@@ -68,16 +72,20 @@
     const table = $('#table');
     var pagination = null;
 
+    window.description_formatter = (value, row, index, field) => {
+        return `<spam id="description-${row.id}">${value}</spam>`;
+    }
+
     window.id_formatter = (value, row, index, field) => {
         return `
         <div class="d-flex justify-content-center mt-3 mt-sm-0">
-            <button type="button" id="button-info-${value}" class="btn btn-info px-4 px-sm-1 me-3 me-sm-1 button-info" title="operação">
+            <button type="button" id="button-info-${value}" class="btn btn-info px-4 px-sm-1 me-3 me-sm-1 button-info" title="informações">
                 <i class="bi bi-info-lg"></i>
             </button>
-            <a href="update/${value}" class="btn btn-primary px-4 px-sm-1 me-3 me-sm-1" title="editar" id="update-${value}">
+            <a href="update/${value}" class="btn btn-primary px-4 px-sm-1 me-3 me-sm-1" title="editar manutenção" id="update-${value}">
                 <i class="bi bi-pencil"></i>
             </a>
-            <button type="button" id="button-delete-${value}" class="btn btn-danger px-4 px-sm-1 me-3 me-sm-1 button-delete" title="criar nova senha">
+            <button type="button" id="button-delete-${value}" class="btn btn-danger px-4 px-sm-1 me-3 me-sm-1 button-delete" title="apagar manutenção">
                 <i class="bi bi-trash"></i>
             </button>
         </div>`
@@ -110,23 +118,21 @@
         fetch(url)
         .then(response => response.json())
         .then(data => {
-            console.log(data)
             let html = `
                 <div class="text-start">
-                    <h5>descrição: ${data.description}</h5>
-                    <h5>setor: ${data.sector}</h5>
-                    <h5>barco: ${data.boat}</h5>
-                    <h5>periodicidade: ${data.periodicity_display}</h5>
+                    <h5><b>descrição</b>: ${data.description}</h5>
+                    <h5><b>setor</b>: ${data.sector}</h5>
+                    <h5><b>barco</b>: ${data.boat}</h5>
+                    <h5><b>periodicidade</b>: ${data.periodicity_display}</h5>
             `;
-            console.log()
             if (['WE', 'BW'].includes(data.periodicity)) {
-                html += `<h5>dia da semana: ${data.periodicity_week_day}</h5>`
+                html += `<h5><b>dia da semana</b>: ${data.periodicity_week_day}</h5>`
             }
             if (['MO', 'QU', 'SA', 'AN'].includes(data.periodicity)) {
-                html += `<h5>dia do mês: ${data.periodicity_day}</h5>`
+                html += `<h5><b>dia</b>: ${data.periodicity_day}</h5>`
             }
             if (['QU', 'SA', 'AN'].includes(data.periodicity)) {
-                html += `<h5>mês: ${data.periodicity_month}</h5>`
+                html += `<h5><b>mês</b>: ${data.periodicity_month}</h5>`
             }
             html += `</div>`;
             Swal.fire({
@@ -145,8 +151,7 @@
 
     $(document).on('click', '.button-delete', function() {
         const id = $(this).attr('id').split('-')[2];
-        const table_line = $(this).closest('tr');
-        const descricao = table_line.find("td:eq(3)").text();
+        const descricao = $(`#description-${id}`).text();
         Swal.fire({
             title: "Você tem certeza?",
             html: `você vai apagar a manutenção periódica: <strong>${descricao}</strong>`,

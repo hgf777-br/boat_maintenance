@@ -75,9 +75,10 @@ class BoatUpdateView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy("boat:table-boats")
 
     def setup(self, request, *args, **kwargs):
+        all_items = Item.objects.all().order_by('name')
         self.items = {
             sector[1]: [
-                item.name for item in Item.objects.all() if item.sector == sector[0]
+                item.name for item in all_items if item.sector == sector[0]
             ] for sector in Sectors.choices
         }
         self.users_for_notification = []

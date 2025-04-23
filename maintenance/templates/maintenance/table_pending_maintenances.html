@@ -44,13 +44,13 @@
         <thead>
             <tr>
                 {% if request.user.profile != "SO" %}
-                <th data-field="name" data-sortable="true">barco</th>
+                <th data-field="boat" data-sortable="true">barco</th>
                 {% endif %}
                 <th data-field="due_date" data-sortable="true" data-formatter="due_date_formatter" data-cell-style="due_date_style">data limite</th>
                 <th data-field="sector" data-sortable="true" data-formatter="sector_formatter">setor</th>
                 <th data-field="description" data-sortable="true" data-formatter="description_formatter">descrição</th>
                 <th data-field="creator" data-sortable="true" data-visible="false">responsável</th>
-                <th data-field="periodic" data-sortable="true" data-formatter="periodic_formatter" data-visible="false">Periodicidade</th>
+                <th data-field="periodic" data-sortable="true" data-formatter="periodic_formatter" data-visible="false">periodicidade</th>
                 <th data-field="schedule_date" data-sortable="true" data-formatter="schedule_date_formatter" data-cell-style="schedule_date_style">data agendada</th>
                 <th data-field="technician" data-sortable="true">tecnico</th>
                 <th data-field="obs" data-sortable="true" data-visible="false">observações</th>

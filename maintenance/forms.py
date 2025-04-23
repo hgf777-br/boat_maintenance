@@ -30,6 +30,7 @@ class MaintenanceForm(forms.ModelForm):
         )
         widgets = {
             'due_date': forms.TextInput(attrs={'type': 'date'}),
+            'schedule_date': forms.TextInput(attrs={'type': 'date'}),
         }
 
 

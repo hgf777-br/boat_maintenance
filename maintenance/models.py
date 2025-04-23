@@ -9,15 +9,18 @@ from technician.models import Technician
 class Sectors(models.TextChoices):
     ENGINE = 'EN', _('engine')
     HYDRAULIC = 'HY', _('hydraulic')
-    ELETRIC = 'EL', _('electric')
-    KITCHEN = 'KI', _('kitchen')
-    ELETRONIC = 'ET', _('electronic')
+    ELETRICAL = 'EL', _('electrical')
+    ELETRONICS = 'ET', _('electronics')
+    EQUIPMENTS = 'EQ', _('equipments')
     CABLES = 'CA', _('cables')
+    SAILS = 'SA', _('sails')
     RIGGING = 'RI', _('rigging')
-    SAIL = 'SA', _('sail')
-    EQUIPMENT = 'EQ', _('equipment')
-    CONFORT = 'CO', _('confort')
-    OTHER = 'OT', _('other')
+    KITCHEN = 'KI', _('kitchen')
+    LOUNGE = 'LG', _('lounge')
+    CABIN = 'CB', _('cabin')
+    DECK = 'DE', _('deck')
+    COCKPIT = 'CP', _('cockpit')
+    FUN = 'FU', _('fun')
 
 
 class Periodicity(models.TextChoices):

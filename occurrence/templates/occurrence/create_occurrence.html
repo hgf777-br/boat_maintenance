@@ -2,16 +2,13 @@
 {% load i18n %}
 {% load static %}
 {% load boat_extras %}
-{% block extra_css%}
-<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/css/datepicker.min.css'>
-{% endblock extra_css%}
 
 {% block content %}
 <form method="POST" class="needs-validation" novalidate>
     {% csrf_token %}
     <div class="row mb-2 g-2 align-items-end">
         <div class="col-md-8">
-            <h3 class="align-bottom">Nova Manutenção</h3>
+            <h3 class="align-bottom">Nova Ocorrência</h3>
         </div>
         {% if request.user.profile != "SO" %}
         <div class="col-md-4">
@@ -28,14 +25,20 @@
     <div class="row mb-4 g-2">
         <div class="col-md-4">
             <div class="form-floating">
-                {{ form.due_date }}
-                <label for="due_date" class="form-label">{{ form.due_date.label }}</label>
+                {{ form.date }}
+                <label for="date" class="form-label">{{ form.date.label }}</label>
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-floating">
                 {{ form.sector }}
                 <label for="sector" class="form-label">{{ form.sector.label }}</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.engine_hours }}
+                <label for="engine_hours" class="form-label">{{ form.engine_hours.label }}</label>
             </div>
         </div>
     </div>
@@ -60,7 +63,7 @@
         <div class="col">
             <div class="float-end mb-3 me-2">
                 <button type="submit" class="btn btn-outline-success">Cadastrar</button>
-                <a href="{% url 'maintenance:table-pending-maintenances' %}" class="btn btn-outline-danger ms-2">Cancelar</a>
+                <a href="{% url 'occurrence:table-occurrences' %}" class="btn btn-outline-danger ms-2">Cancelar</a>
             </div>
         </div>
     </div>
@@ -68,17 +71,13 @@
 {% endblock content %}
 
 {% block extra_javascript %}
-<script src='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/js/datepicker-full.min.js'></script>
-<script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/js/locales/pt-BR.js"></script>
-{% comment %} <script src="{% static 'js/datepicker.min.js' %}"></script> {% endcomment %}
 <script>
-    function change_validity(element, validity) {
-        if (!validity) {
-            element.classList.add('is-invalid');
-            element.setCustomValidity("Invalid field.");
+    function check_if_engine_hours_needed(field) {
+        if (field.val() === 'EN') {
+            $('#id_engine_hours').prop('disabled', false);
         } else {
-            element.classList.remove('is-invalid');
-            element.setCustomValidity("");
+            $('#id_engine_hours').prop('disabled', true);
+            $('#id_engine_hours').val('');
         }
     }
 
@@ -86,6 +85,8 @@
         'use strict'
         // Fetch all the forms we want to apply custom Bootstrap validation styles to
         const forms = document.querySelectorAll('.needs-validation')
+        const sector = $('#id_sector');
+        check_if_engine_hours_needed(sector);
 
         // Loop over them and prevent submission
         Array.from(forms).forEach(form => {
@@ -97,6 +98,10 @@
                 }
                 form.classList.add('was-validated');
             }, false)
+        })
+
+        sector.on('change', function() {
+            check_if_engine_hours_needed($(this));
         })
 
     })()

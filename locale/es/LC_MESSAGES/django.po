@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-15 09:49-0300\n"
+"POT-Creation-Date: 2025-04-22 14:26-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,16 +35,29 @@ msgstr ""
 msgid "items"
 msgstr ""
 
-#: .\boat\models.py:43 .\maintenance\models.py:50 .\maintenance\models.py:81
+#: .\boat\models.py:29
+msgid "users for notifications"
+msgstr ""
+
+#: .\boat\models.py:47 .\maintenance\models.py:53 .\maintenance\models.py:84
 #: .\occurrence\models.py:17 .\occurrence\models.py:40
-#: .\technician\models.py:20 .\user\models.py:40
+#: .\technician\models.py:22 .\user\models.py:39
 msgid "created at"
 msgstr ""
 
-#: .\boat\models.py:44 .\maintenance\models.py:51 .\maintenance\models.py:82
+#: .\boat\models.py:48 .\maintenance\models.py:54 .\maintenance\models.py:85
 #: .\occurrence\models.py:18 .\occurrence\models.py:41
-#: .\technician\models.py:21 .\user\models.py:41
+#: .\technician\models.py:23 .\user\models.py:40
 msgid "updated at"
+msgstr ""
+
+#: .\boat\models.py:111
+msgid "user"
+msgstr ""
+
+#: .\boat\models.py:112 .\maintenance\models.py:42 .\maintenance\models.py:71
+#: .\occurrence\models.py:15 .\occurrence\models.py:37
+msgid "boat"
 msgstr ""
 
 #: .\boat_maintenance\settings.py:179
@@ -68,15 +81,15 @@ msgid "hydraulic"
 msgstr ""
 
 #: .\maintenance\models.py:12
-msgid "electric"
+msgid "electrical"
 msgstr ""
 
 #: .\maintenance\models.py:13
-msgid "kitchen"
+msgid "electronics"
 msgstr ""
 
 #: .\maintenance\models.py:14
-msgid "electronic"
+msgid "equipments"
 msgstr ""
 
 #: .\maintenance\models.py:15
@@ -84,204 +97,211 @@ msgid "cables"
 msgstr ""
 
 #: .\maintenance\models.py:16
-msgid "rigging"
+msgid "sails"
 msgstr ""
 
 #: .\maintenance\models.py:17
-msgid "sail"
+msgid "rigging"
 msgstr ""
 
 #: .\maintenance\models.py:18
-msgid "equipment"
+msgid "kitchen"
 msgstr ""
 
 #: .\maintenance\models.py:19
-msgid "confort"
+msgid "lounge"
 msgstr ""
 
-#: .\maintenance\models.py:20 .\technician\models.py:14
-msgid "other"
+#: .\maintenance\models.py:20
+msgid "cabin"
 msgstr ""
 
-#: .\maintenance\models.py:24
-msgid "weekly"
+#: .\maintenance\models.py:21
+msgid "deck"
 msgstr ""
 
-#: .\maintenance\models.py:25
-msgid "bi-weekly"
+#: .\maintenance\models.py:22
+msgid "cockpit"
 msgstr ""
 
-#: .\maintenance\models.py:26
-msgid "monthly"
+#: .\maintenance\models.py:23
+msgid "fun"
 msgstr ""
 
 #: .\maintenance\models.py:27
-msgid "quarterly"
+msgid "weekly"
 msgstr ""
 
 #: .\maintenance\models.py:28
-msgid "semi-annually"
+msgid "bi-weekly"
 msgstr ""
 
 #: .\maintenance\models.py:29
+msgid "monthly"
+msgstr ""
+
+#: .\maintenance\models.py:30
+msgid "quarterly"
+msgstr ""
+
+#: .\maintenance\models.py:31
+msgid "semi-annually"
+msgstr ""
+
+#: .\maintenance\models.py:32
 msgid "annually"
 msgstr ""
 
-#: .\maintenance\models.py:34 .\maintenance\models.py:66
+#: .\maintenance\models.py:37 .\maintenance\models.py:69
 #: .\occurrence\models.py:9
 msgid "description"
 msgstr ""
 
-#: .\maintenance\models.py:35
+#: .\maintenance\models.py:38
 msgid "due date"
 msgstr ""
 
-#: .\maintenance\models.py:36 .\maintenance\models.py:69
+#: .\maintenance\models.py:39 .\maintenance\models.py:72
 #: .\occurrence\models.py:11 .\occurrence\models.py:26
 msgid "sector"
 msgstr ""
 
-#: .\maintenance\models.py:38 .\maintenance\models.py:67
+#: .\maintenance\models.py:41 .\maintenance\models.py:70
 #: .\occurrence\models.py:14 .\occurrence\models.py:36
 msgid "creator"
 msgstr ""
 
-#: .\maintenance\models.py:39 .\maintenance\models.py:68
-#: .\occurrence\models.py:15 .\occurrence\models.py:37
-msgid "boat"
-msgstr ""
-
-#: .\maintenance\models.py:40
+#: .\maintenance\models.py:43
 msgid "schedule date"
 msgstr ""
 
-#: .\maintenance\models.py:41
+#: .\maintenance\models.py:44
 msgid "technician"
 msgstr ""
 
-#: .\maintenance\models.py:43 .\occurrence\models.py:13
+#: .\maintenance\models.py:46 .\occurrence\models.py:13
 #: .\occurrence\models.py:38 .\occurrence\models.py:51
 msgid "observation"
 msgstr ""
 
-#: .\maintenance\models.py:44
+#: .\maintenance\models.py:47
 msgid "finish date"
 msgstr ""
 
-#: .\maintenance\models.py:45
+#: .\maintenance\models.py:48
 msgid "completed"
 msgstr ""
 
-#: .\maintenance\models.py:46 .\occurrence\models.py:16
+#: .\maintenance\models.py:49 .\occurrence\models.py:16
 #: .\occurrence\models.py:35
 msgid "engine hours"
 msgstr ""
 
-#: .\maintenance\models.py:47
+#: .\maintenance\models.py:50
 msgid "value"
 msgstr ""
 
-#: .\maintenance\models.py:48
+#: .\maintenance\models.py:51
 msgid "periodic"
 msgstr ""
 
-#: .\maintenance\models.py:62
+#: .\maintenance\models.py:65
 msgid "Monday"
 msgstr ""
 
-#: .\maintenance\models.py:62
+#: .\maintenance\models.py:65
 msgid "Tuesday"
 msgstr ""
 
-#: .\maintenance\models.py:62
+#: .\maintenance\models.py:65
 msgid "Wednesday"
 msgstr ""
 
-#: .\maintenance\models.py:62
+#: .\maintenance\models.py:65
 msgid "Thursday"
 msgstr ""
 
-#: .\maintenance\models.py:62
+#: .\maintenance\models.py:65
 msgid "Friday"
 msgstr ""
 
-#: .\maintenance\models.py:62
+#: .\maintenance\models.py:65
 msgid "Saturday"
 msgstr ""
 
-#: .\maintenance\models.py:62
+#: .\maintenance\models.py:65
 msgid "Sunday"
 msgstr ""
 
-#: .\maintenance\models.py:63
+#: .\maintenance\models.py:66
 msgid "January"
 msgstr ""
 
-#: .\maintenance\models.py:63
+#: .\maintenance\models.py:66
 msgid "February"
 msgstr ""
 
-#: .\maintenance\models.py:63
+#: .\maintenance\models.py:66
 msgid "March"
 msgstr ""
 
-#: .\maintenance\models.py:63
+#: .\maintenance\models.py:66
 msgid "April"
 msgstr ""
 
-#: .\maintenance\models.py:63
+#: .\maintenance\models.py:66
 msgid "May"
 msgstr ""
 
-#: .\maintenance\models.py:63
+#: .\maintenance\models.py:66
 msgid "June"
 msgstr ""
 
-#: .\maintenance\models.py:64
+#: .\maintenance\models.py:67
 msgid "July"
 msgstr ""
 
-#: .\maintenance\models.py:64
+#: .\maintenance\models.py:67
 msgid "August"
 msgstr ""
 
-#: .\maintenance\models.py:64
+#: .\maintenance\models.py:67
 msgid "September"
 msgstr ""
 
-#: .\maintenance\models.py:64
+#: .\maintenance\models.py:67
 msgid "October"
 msgstr ""
 
-#: .\maintenance\models.py:64
+#: .\maintenance\models.py:67
 msgid "November"
 msgstr ""
 
-#: .\maintenance\models.py:64
+#: .\maintenance\models.py:67
 msgid "December"
 msgstr ""
 
-#: .\maintenance\models.py:72
+#: .\maintenance\models.py:75
 msgid "periodicity"
 msgstr ""
 
-#: .\maintenance\models.py:73
+#: .\maintenance\models.py:76
 msgid "day of month"
 msgstr ""
 
-#: .\maintenance\models.py:76
+#: .\maintenance\models.py:79
 msgid "month"
 msgstr ""
 
-#: .\maintenance\models.py:78
+#: .\maintenance\models.py:81
 msgid "day of week"
 msgstr ""
 
-#: .\maintenance\models.py:79
+#: .\maintenance\models.py:82
 msgid "periodicity value"
 msgstr ""
 
-#: .\maintenance\models.py:80
+#: .\maintenance\models.py:83
 msgid "last run date"
 msgstr ""
 
@@ -329,7 +349,11 @@ msgstr ""
 msgid "engineer"
 msgstr ""
 
-#: .\technician\models.py:17 .\user\models.py:38
+#: .\technician\models.py:14
+msgid "other"
+msgstr ""
+
+#: .\technician\models.py:17 .\user\models.py:37
 msgid "cell phone"
 msgstr ""
 
@@ -339,6 +363,10 @@ msgstr ""
 
 #: .\technician\models.py:19
 msgid "speciality"
+msgstr ""
+
+#: .\technician\models.py:21
+msgid "company"
 msgstr ""
 
 #: .\user\managers.py:15
@@ -357,50 +385,50 @@ msgstr ""
 msgid "Superuser must have is_superuser=True."
 msgstr ""
 
-#: .\user\models.py:17
+#: .\user\models.py:16
 msgid "share owner"
 msgstr ""
 
-#: .\user\models.py:18
+#: .\user\models.py:17
 msgid "operator"
 msgstr ""
 
-#: .\user\models.py:19
+#: .\user\models.py:18
 msgid "master"
 msgstr ""
 
-#: .\user\models.py:30
+#: .\user\models.py:29
 msgid "profile"
 msgstr ""
 
-#: .\user\models.py:36
+#: .\user\models.py:35
 msgid "theme"
 msgstr ""
 
-#: .\user\models.py:39
+#: .\user\models.py:38
 msgid "email address"
 msgstr ""
 
-#: .\user\models.py:85
+#: .\user\models.py:84
 msgid "address"
 msgstr ""
 
-#: .\user\models.py:86
+#: .\user\models.py:85
 msgid "state"
 msgstr ""
 
-#: .\user\models.py:87
+#: .\user\models.py:86
 msgid "city"
 msgstr ""
 
-#: .\user\models.py:88
+#: .\user\models.py:87
 msgid "country"
 msgstr ""
 
-#: .\user\models.py:89
+#: .\user\models.py:88
 msgid "zip code"
 msgstr ""
 
-#: .\user\models.py:90
+#: .\user\models.py:89
 msgid "birth date"
 msgstr ""

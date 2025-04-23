@@ -30,6 +30,11 @@ def technician_full_name(technician):
     return ""
 
 
+def dict_value(dict, key):
+    return dict.get(key, "")
+
+
+register.filter("dict_value", dict_value)
 register.filter("boat", boat_from_user)
 register.filter("not_in_list", not_in_list)
 register.filter("technician_full_name", technician_full_name)

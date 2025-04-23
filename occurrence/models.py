@@ -2,18 +2,22 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 
-from maintenance.models import Sectors
+from maintenance.models import Sectors, Maintenance
 
 
 class Occurrence(models.Model):
     description = models.CharField(max_length=256, verbose_name=_("description"))
     date = models.DateField(verbose_name=_("date"))
-    sector = models.CharField(max_length=2, choices=Sectors, verbose_name=_("sector"),
-                              blank=False, default=Sectors.ENGINE)
-    observation = models.TextField(verbose_name=_("observation"), blank=True)
+    sector = models.CharField(
+        max_length=2, choices=Sectors, verbose_name=_("sector"), blank=False, default=Sectors.ENGINE
+        )
+    obs = models.TextField(verbose_name=_("observation"), blank=True)
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, verbose_name=_("creator"))
     boat = models.ForeignKey("boat.Boat", on_delete=models.PROTECT, verbose_name=_("boat"))
     engine_hours = models.PositiveIntegerField(verbose_name=_("engine hours"), blank=True, null=True)
+    maintenance = models.ForeignKey(
+        Maintenance, on_delete=models.PROTECT, verbose_name=_("maintenance"), blank=True, null=True
+        )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("created at"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("updated at"))
 

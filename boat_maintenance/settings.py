@@ -71,8 +71,8 @@ INSTALLED_APPS = [
     'user',
     'boat',
     'technician',
-    'occurrence',
     'maintenance',
+    'occurrence',
 ]
 
 MIDDLEWARE = [

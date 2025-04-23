@@ -1,5 +1,6 @@
 {% extends "partials/base_table.html" %}
 {% load static %}
+{% load boat_extras %}
 
 {% block extra_css %}
 <style>
@@ -10,10 +11,15 @@
 {% endblock extra_css %}
 
 {% block content %}
-    <div class="row">
+    <div class="row align-items-end">
         <div class="col">
             <h3>Manutenções <span class="h6">finalizadas</span></h3>
         </div>
+        {% if request.user.profile == 'SO' %}
+        <div class="col-auto">
+            <h5>{{ request.user|boat:'name'}}</h5>
+        </div>
+        {% endif %}
         <hr>
     </div>
     <table id="table"
@@ -27,7 +33,9 @@
         data-check-on-init="true">
         <thead>
             <tr>
+                {% if request.user.profile != "SO" %}
                 <th data-field="boat" data-sortable="true">barco</th>
+                {% endif %}
                 <th data-field="finish_date" data-sortable="true" data-formatter="finish_date_formatter">data finalização</th>
                 <th data-field="sector" data-sortable="true">setor</th>
                 <th data-field="description" data-sortable="true">descrição</th>
@@ -39,7 +47,9 @@
         <tbody>
             {% for maintenance in maintenances_list %}
             <tr>
+                {% if request.user.profile != "SO" %}
                 <td>{{ maintenance.boat }}</td>
+                {% endif %}
                 <td>{{ maintenance.finish_date|date:"Y-m-d" }}</td>
                 <td>{{ maintenance.get_sector_display }}</td>
                 <td>{{ maintenance.description }}</td>
