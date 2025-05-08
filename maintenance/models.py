@@ -46,7 +46,7 @@ class Maintenance(models.Model):
     obs = models.TextField(verbose_name=_("observation"), blank=True)
     finish_date = models.DateField(blank=True, null=True, verbose_name=_("finish date"))
     completed = models.BooleanField(default=False, verbose_name=_("completed"))
-    engine_hours = models.PositiveIntegerField(verbose_name=_("engine hours"), blank=True, null=True)
+    hour_meter = models.PositiveIntegerField(verbose_name=_("hour meter"), blank=True, null=True)
     value = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_("value"), blank=True, null=True)
     periodic = models.ForeignKey("Periodic", on_delete=models.CASCADE, verbose_name=_("periodic"),
                                  blank=True, null=True)

@@ -15,11 +15,11 @@
 
 {% block content %}
     <div id="toolbar">
-        <a href="{% url 'occurrence:create-occurrence' %}" class="btn btn-primary">Nova Ocorrência</a>
+        <a href="{% url 'occurrence:create-check-in-out' %}" class="btn btn-primary">Novo Check In</a>
     </div>
     <div class="row">
         <div class="col">
-            <h3>Ocorrências</h3>
+            <h3>Check Ins</h3>
         </div>
         {% if request.user.profile == 'SO' %}
         <div class="col-auto">
@@ -46,30 +46,28 @@
                 {% if request.user.profile != "SO" %}
                 <th data-field="boat" data-sortable="true">barco</th>
                 {% endif %}
-                <th data-field="date" data-sortable="true" data-formatter="date_formatter">data</th>
-                <th data-field="sector" data-sortable="true">setor</th>
-                <th data-field="description" data-sortable="true">descrição</th>
+                <th data-field="checkin_date" data-sortable="true" data-formatter="date_formatter">data checkin</th>
+                <th data-field="checkin_hour_meter" data-sortable="true">horímetro checkin</th>
+                <th data-field="checkout_date" data-sortable="true" data-formatter="date_formatter">data checkout</th>
+                <th data-field="checkout_hour_meter" data-sortable="true">horímetro checkout</th>
                 <th data-field="creator" data-sortable="true" data-visible="false">responsável</th>
-                <th data-field="maintenance" data-sortable="true" data-visible="false" data-formatter="maintenance_formatter">manutenção</th>
-                <th data-field="hour_meter" data-sortable="true" data-visible="false">hora do motor</th>
                 <th data-field="obs" data-sortable="true" data-visible="false">observação</th>
                 <th data-field="id" data-sortable="false" data-formatter="id_formatter"></th>
             </tr>
         </thead>
         <tbody>
-            {% for occurrence in occurrences_list %}
+            {% for check_in_out in check_in_out_list %}
             <tr>
                 {% if request.user.profile != "SO" %}
-                <td>{{ occurrence.boat }}</td>
+                <td>{{ check_in_out.boat }}</td>
                 {% endif %}
-                <td>{{ occurrence.date|date:"Y-m-d" }}</td>
-                <td>{{ occurrence.get_sector_display }}</td>
-                <td>{{ occurrence.description }}</td>
-                <td>{{ occurrence.creator.get_full_name }}</td>
-                <td>{{ occurrence.maintenance }}</td>
-                <td>{{ occurrence.hour_meter }}</td>
-                <td>{{ occurrence.obs }}</td>
-                <td>{{ occurrence.id }}</td>
+                <td>{{ check_in_out.checkin_date|date:"Y-m-d" }}</td>
+                <td>{{ check_in_out.checkin_hour_meter }}</td>
+                <td>{{ check_in_out.checkout_date|date:"Y-m-d" }}</td>
+                <td>{{ check_in_out.checkout_hour_meter }}</td>
+                <td>{{ check_in_out.creator.get_full_name }}</td>
+                <td>{{ check_in_out.obs }}</td>
+                <td>{{ check_in_out.id }}</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -5,7 +5,11 @@ from .views import (
     OccurrenceDeleteView,
     OccurrenceUpdateView,
     OccurrencesTableView,
-    OccurrenceCreateMaintenanceView,  # Create a maintenance for an occurrence. This is a POST request.
+    OccurrenceCreateMaintenanceView,
+    CheckInOutsTableView,
+    CheckInOutCreateView,
+    CheckInOutUpdateView,
+    CheckInOutDeleteView,  # Create a check-in/check-out for an occurrence. This is a POST request.
 )
 
 app_name = 'occurrence'
@@ -19,4 +23,8 @@ urlpatterns = [
         OccurrenceCreateMaintenanceView.as_view(),
         name='create-maintenance-occurrence'
         ),
+    path('check_in_out/', CheckInOutsTableView.as_view(), name='table-check-in-outs'),
+    path('check_in_out/create/', CheckInOutCreateView.as_view(), name='create-check-in-out'),
+    path('check_in_out/update/<int:pk>', CheckInOutUpdateView.as_view(), name='update-check-in-out'),
+    path('check_in_out/delete/<int:pk>', CheckInOutDeleteView.as_view(), name='delete-check-in-out'),
 ]

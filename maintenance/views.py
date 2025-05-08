@@ -121,7 +121,7 @@ class MaintenanceFlowView(LoginRequiredMixin, View):
             if data['has_schedule']:
                 finish_date = datetime.strptime(data['finish_date'], r'%Y-%m-%d')
                 maintenance.finish_date = finish_date
-                maintenance.engine_hours = int(data['engine_hours']) if data['engine_hours'] else None
+                maintenance.hour_meter = int(data['hour_meter']) if data['hour_meter'] else None
                 maintenance.value = float(data['value']) if data['value'] else None
                 maintenance.completed = True
                 if maintenance.periodic:

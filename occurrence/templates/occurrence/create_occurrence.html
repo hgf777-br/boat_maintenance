@@ -37,8 +37,8 @@
         </div>
         <div class="col-md-4">
             <div class="form-floating">
-                {{ form.engine_hours }}
-                <label for="engine_hours" class="form-label">{{ form.engine_hours.label }}</label>
+                {{ form.hour_meter }}
+                <label for="hour_meter" class="form-label">{{ form.hour_meter.label }}</label>
             </div>
         </div>
     </div>
@@ -72,12 +72,12 @@
 
 {% block extra_javascript %}
 <script>
-    function check_if_engine_hours_needed(field) {
+    function check_if_hour_meter_needed(field) {
         if (field.val() === 'EN') {
-            $('#id_engine_hours').prop('disabled', false);
+            $('#id_hour_meter').prop('disabled', false);
         } else {
-            $('#id_engine_hours').prop('disabled', true);
-            $('#id_engine_hours').val('');
+            $('#id_hour_meter').prop('disabled', true);
+            $('#id_hour_meter').val('');
         }
     }
 
@@ -86,7 +86,7 @@
         // Fetch all the forms we want to apply custom Bootstrap validation styles to
         const forms = document.querySelectorAll('.needs-validation')
         const sector = $('#id_sector');
-        check_if_engine_hours_needed(sector);
+        check_if_hour_meter_needed(sector);
 
         // Loop over them and prevent submission
         Array.from(forms).forEach(form => {
@@ -101,7 +101,7 @@
         })
 
         sector.on('change', function() {
-            check_if_engine_hours_needed($(this));
+            check_if_hour_meter_needed($(this));
         })
 
     })()

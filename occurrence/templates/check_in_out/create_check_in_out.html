@@ -8,7 +8,7 @@
     {% csrf_token %}
     <div class="row mb-2 g-2 align-items-end">
         <div class="col-md-8">
-            <h3 class="align-bottom">Editar Ocorrência</h3>
+            <h3 class="align-bottom">Novo Check In</h3>
         </div>
         {% if request.user.profile != "SO" %}
         <div class="col-md-4">
@@ -25,45 +25,32 @@
     <div class="row mb-4 g-2">
         <div class="col-md-4">
             <div class="form-floating">
-                {{ form.date }}
-                <label for="date" class="form-label">{{ form.date.label }}</label>
+                {{ form.checkin_date }}
+                <label for="checkin_date" class="form-label">{{ form.checkin_date.label }}</label>
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-floating">
-                {{ form.sector }}
-                <label for="sector" class="form-label">{{ form.sector.label }}</label>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="form-floating">
-                {{ form.hour_meter }}
-                <label for="hour_meter" class="form-label">{{ form.hour_meter.label }}</label>
+                {{ form.checkin_hour_meter }}
+                <label for="checkin_hour_meter" class="form-label">{{ form.checkin_hour_meter.label }}</label>
             </div>
         </div>
     </div>
-    <div class="row mb-4 g-2">
+    <div class="row mb-3 g-2">
         <div class="col">
             <div class="form-floating">
-                {{ form.description }}
-                <label for="description" class="form-label">{{ form.description.label }}</label>
+                {{ form.checkin_obs }}
+                <label for="checkin_obs" class="form-label">{{ form.checkin_obs.label }}</label>
             </div>
         </div>
     </div>
-    <div class="row mb-4 g-2">
-        <div class="col">
-            <div class="form-floating">
-                {{ form.obs }}
-                <label for="obs" class="form-label">{{ form.obs.label }}</label>
-            </div>
-        </div>
-    </div>
+    <h4>Pendências do último Check Out</h4>
     <hr>
     <div class="row">
         <div class="col">
             <div class="float-end mb-3 me-2">
-                <button type="submit" class="btn btn-outline-success">Alterar</button>
-                <a href="{% url 'occurrence:table-occurrences' %}" class="btn btn-outline-danger ms-2">Cancelar</a>
+                <button type="submit" class="btn btn-outline-success">Cadastrar</button>
+                <a href="{% url 'occurrence:table-check-in-outs' %}" class="btn btn-outline-danger ms-2">Cancelar</a>
             </div>
         </div>
     </div>

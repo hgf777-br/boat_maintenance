@@ -12,8 +12,8 @@ from rest_framework import serializers
 from boat.models import Boat
 from maintenance.models import Maintenance, Sectors
 
-from .forms import OccurrenceForm
-from .models import Occurrence
+from .forms import CheckInOutForm, OccurrenceForm
+from .models import CheckInOut, Occurrence
 
 
 class OccurrencesTableView(LoginRequiredMixin, ListView):
@@ -106,4 +106,47 @@ class OccurrenceCreateMaintenanceView(LoginRequiredMixin, View):
             return JsonResponse({"status": "error", "message": "Ocorrência ou técnico não encontrados"})
         except Exception as e:
             print(e)
+            return JsonResponse({"status": "error", "message": str(e)})
+
+
+class CheckInOutsTableView(LoginRequiredMixin, ListView):
+    model = CheckInOut
+    template_name = "check_in_out/table_check_in_outs.html"
+    context_object_name = "check_in_out_list"
+
+
+class CheckInOutCreateView(LoginRequiredMixin, CreateView):
+    model = CheckInOut
+    form_class = CheckInOutForm
+    template_name = "check_in_out/create_check_in_out.html"
+    success_url = reverse_lazy("occurrence:table-check-in-outs")
+
+    def form_valid(self, form):
+        occurrence = form.save(commit=False)
+        occurrence.creator = self.request.user
+        occurrence.save()
+        messages.success(self.request, 'Ocorrência criada com sucesso')
+        return HttpResponseRedirect(self.success_url)
+
+
+class CheckInOutUpdateView(LoginRequiredMixin, UpdateView):
+    model = CheckInOut
+    form_class = CheckInOutForm
+    template_name = "occurrence/update_occurrence.html"
+    success_url = reverse_lazy("occurrence:table-occurrences")
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Ocorrência atualizada com sucesso')
+        return super().form_valid(form)
+
+
+class CheckInOutDeleteView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        try:
+            occurrence = CheckInOut.objects.get(pk=kwargs["pk"])
+            occurrence.delete()
+            return JsonResponse({"status": "ok", "message": "Ocorrência excluída com sucesso"})
+        except ObjectDoesNotExist:
+            return JsonResponse({"status": "error", "message": "Ocorrência não encontrada"})
+        except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)})

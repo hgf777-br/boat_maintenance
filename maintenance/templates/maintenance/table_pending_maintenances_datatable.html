@@ -179,8 +179,8 @@
                     `
                     if (sector == 'motor') {
                         content += `<div class="form-floating mb-3">
-                                    <input type="number" name="engine_hours" class="form-control" id="id_engine_hours">
-                                    <label for="engine_hours" class="form-label">horímetro</label>
+                                    <input type="number" name="hour_meter" class="form-control" id="id_hour_meter">
+                                    <label for="hour_meter" class="form-label">horímetro</label>
                                 </div>`
                     }
                 } else {
@@ -205,9 +205,9 @@
                     schedule_date = new Date(schedule_date.slice(6,10), parseInt(schedule_date.slice(3,5)) - 1, schedule_date.slice(0,2));
                     const finish_date = $('#id_finish_date').val();
                     const cost_value = $('#id_cost_value').cleanVal() / 100;
-                    const engine_hours = $('#id_engine_hours').val() ? $('#id_engine_hours').val() : null;
+                    const hour_meter = $('#id_hour_meter').val() ? $('#id_hour_meter').val() : null;
                     console.log(cost_value)
-                    if (!finish_date || (sector == 'motor' && !engine_hours) || !cost_value) {
+                    if (!finish_date || (sector == 'motor' && !hour_meter) || !cost_value) {
                         Swal.showValidationMessage("Por favor, preencha todos os campos.");
                         Swal.enableButtons();
                         return false;
@@ -219,7 +219,7 @@
                         Swal.enableButtons();
                         return false;
                     }
-                    return { finish_date, engine_hours, cost_value };
+                    return { finish_date, hour_meter, cost_value };
                 } else {
                     let schedule_date = $('#id_schedule_date').val();
                     const technician = $('#id_technician').val();
@@ -244,7 +244,7 @@
                         schedule_date: result.value.schedule_date,
                         technician_id: result.value.technician,
                         finish_date: result.value.finish_date,
-                        engine_hours: result.value.engine_hours,
+                        hour_meter: result.value.hour_meter,
                         value: result.value.cost_value,
                     }
                     fetch(url, {
@@ -277,7 +277,7 @@
                                 location.reload();
                             }
                         }, 2000);
-                    })    
+                    })
                     .catch(error => console.error(error));
                 }
         })
@@ -323,9 +323,9 @@
                             background: "#FFB0B0",
                         });
                     }
-                    }) 
+                    })
                 .catch(error => console.error(error));
-            } 
+            }
         });
     })
 </script>

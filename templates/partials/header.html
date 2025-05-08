@@ -12,10 +12,9 @@
                 <spam class="d-none d-sm-inline">ocorrência</spam>
             </a>
             <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{% url 'occurrence:table-occurrences' %}">pontual</a></li>
+                <li><a class="dropdown-item" href="{% url 'occurrence:table-check-in-outs' %}">check In/Out</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#">checkin</a></li>
-                <li><a class="dropdown-item" href="#">checkout</a></li>
+                <li><a class="dropdown-item" href="{% url 'occurrence:table-occurrences' %}">pontual</a></li>
             </ul>
         </li>
         <li class="nav-item dropdown">

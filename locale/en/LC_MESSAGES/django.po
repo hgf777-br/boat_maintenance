@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-22 14:26-0300\n"
+"POT-Creation-Date: 2025-05-01 18:26-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: .\boat\models.py:20 .\occurrence\models.py:25 .\technician\models.py:16
+#: .\boat\models.py:20 .\occurrence\models.py:29 .\technician\models.py:16
 msgid "name"
 msgstr ""
 
@@ -30,7 +30,7 @@ msgstr ""
 msgid "manufacturer"
 msgstr ""
 
-#: .\boat\models.py:26 .\occurrence\models.py:39
+#: .\boat\models.py:26 .\occurrence\models.py:43
 msgid "items"
 msgstr ""
 
@@ -39,13 +39,13 @@ msgid "users for notifications"
 msgstr ""
 
 #: .\boat\models.py:47 .\maintenance\models.py:53 .\maintenance\models.py:84
-#: .\occurrence\models.py:17 .\occurrence\models.py:40
+#: .\occurrence\models.py:21 .\occurrence\models.py:44
 #: .\technician\models.py:22 .\user\models.py:39
 msgid "created at"
 msgstr ""
 
 #: .\boat\models.py:48 .\maintenance\models.py:54 .\maintenance\models.py:85
-#: .\occurrence\models.py:18 .\occurrence\models.py:41
+#: .\occurrence\models.py:22 .\occurrence\models.py:45
 #: .\technician\models.py:23 .\user\models.py:40
 msgid "updated at"
 msgstr ""
@@ -55,7 +55,7 @@ msgid "user"
 msgstr ""
 
 #: .\boat\models.py:112 .\maintenance\models.py:42 .\maintenance\models.py:71
-#: .\occurrence\models.py:15 .\occurrence\models.py:37
+#: .\occurrence\models.py:16 .\occurrence\models.py:41
 msgid "boat"
 msgstr ""
 
@@ -161,12 +161,12 @@ msgid "due date"
 msgstr ""
 
 #: .\maintenance\models.py:39 .\maintenance\models.py:72
-#: .\occurrence\models.py:11 .\occurrence\models.py:26
+#: .\occurrence\models.py:12 .\occurrence\models.py:30
 msgid "sector"
 msgstr ""
 
 #: .\maintenance\models.py:41 .\maintenance\models.py:70
-#: .\occurrence\models.py:14 .\occurrence\models.py:36
+#: .\occurrence\models.py:15 .\occurrence\models.py:40
 msgid "creator"
 msgstr ""
 
@@ -178,8 +178,8 @@ msgstr ""
 msgid "technician"
 msgstr ""
 
-#: .\maintenance\models.py:46 .\occurrence\models.py:13
-#: .\occurrence\models.py:38 .\occurrence\models.py:51
+#: .\maintenance\models.py:46 .\occurrence\models.py:14
+#: .\occurrence\models.py:42 .\occurrence\models.py:55
 msgid "observation"
 msgstr ""
 
@@ -191,9 +191,8 @@ msgstr ""
 msgid "completed"
 msgstr ""
 
-#: .\maintenance\models.py:49 .\occurrence\models.py:16
-#: .\occurrence\models.py:35
-msgid "engine hours"
+#: .\maintenance\models.py:49
+msgid "hour meter"
 msgstr ""
 
 #: .\maintenance\models.py:50
@@ -304,19 +303,27 @@ msgstr ""
 msgid "last run date"
 msgstr ""
 
-#: .\occurrence\models.py:10 .\occurrence\models.py:34
+#: .\occurrence\models.py:10 .\occurrence\models.py:38
 msgid "date"
 msgstr ""
 
-#: .\occurrence\models.py:48
+#: .\occurrence\models.py:17 .\occurrence\models.py:39
+msgid "engine hours"
+msgstr ""
+
+#: .\occurrence\models.py:19
+msgid "maintenance"
+msgstr ""
+
+#: .\occurrence\models.py:52
 msgid "checkout"
 msgstr ""
 
-#: .\occurrence\models.py:49
+#: .\occurrence\models.py:53
 msgid "item"
 msgstr ""
 
-#: .\occurrence\models.py:50
+#: .\occurrence\models.py:54
 msgid "is ok"
 msgstr ""
 
