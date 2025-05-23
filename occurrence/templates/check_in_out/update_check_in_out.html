@@ -8,7 +8,7 @@
     {% csrf_token %}
     <div class="row mb-2 g-2 align-items-end">
         <div class="col-md-8">
-            <h3 class="align-bottom">Novo Check In</h3>
+            <h3 class="align-bottom">Editar Check In</h3>
         </div>
         {% if request.user.profile != "SO" %}
         <div class="col-md-4">
@@ -44,7 +44,6 @@
             </div>
         </div>
     </div>
-    <h4>Pendências do último Check Out</h4>
     <hr>
     <div class="row">
         <div class="col">
@@ -59,21 +58,10 @@
 
 {% block extra_javascript %}
 <script>
-    function check_if_hour_meter_needed(field) {
-        if (field.val() === 'EN') {
-            $('#id_hour_meter').prop('disabled', false);
-        } else {
-            $('#id_hour_meter').prop('disabled', true);
-            $('#id_hour_meter').val('');
-        }
-    }
-
     (() => {
         'use strict'
         // Fetch all the forms we want to apply custom Bootstrap validation styles to
         const forms = document.querySelectorAll('.needs-validation')
-        const sector = $('#id_sector');
-        check_if_hour_meter_needed(sector);
 
         // Loop over them and prevent submission
         Array.from(forms).forEach(form => {
@@ -86,11 +74,6 @@
                 form.classList.add('was-validated');
             }, false)
         })
-
-        sector.on('change', function() {
-            check_if_hour_meter_needed($(this));
-        })
-
     })()
 </script>
 {% endblock extra_javascript %}

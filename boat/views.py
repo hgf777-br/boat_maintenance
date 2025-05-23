@@ -37,9 +37,10 @@ class BoatCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy("boat:table-boats")
 
     def __init__(self, **kwargs):
+        all_items = Item.objects.all().order_by('name')
         self.items = {
             sector[1]: [
-                item.name for item in Item.objects.all() if item.sector == sector[0]
+                item.name for item in all_items if item.sector == sector[0]
             ] for sector in Sectors.choices
         }
 

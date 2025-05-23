@@ -44,15 +44,16 @@
         <thead>
             <tr>
                 {% if request.user.profile != "SO" %}
-                <th data-field="boat" data-sortable="true">barco</th>
+                <th data-field="boat" data-align="center" data-sortable="true">barco</th>
                 {% endif %}
-                <th data-field="checkin_date" data-sortable="true" data-formatter="date_formatter">data checkin</th>
-                <th data-field="checkin_hour_meter" data-sortable="true">horímetro checkin</th>
-                <th data-field="checkout_date" data-sortable="true" data-formatter="date_formatter">data checkout</th>
-                <th data-field="checkout_hour_meter" data-sortable="true">horímetro checkout</th>
                 <th data-field="creator" data-sortable="true" data-visible="false">responsável</th>
-                <th data-field="obs" data-sortable="true" data-visible="false">observação</th>
-                <th data-field="id" data-sortable="false" data-formatter="id_formatter"></th>
+                <th data-field="checkin_date" data-sortable="true" data-align="center" data-formatter="checkin_date_formatter">checkin<br>data</th>
+                <th data-field="checkin_hour_meter" data-sortable="true" data-align="center">checkin<br>horímetro</th>
+                <th data-field="checkout_date" data-sortable="true" data-align="center" data-formatter="checkout_date_formatter">checkout<br>data</th>
+                <th data-field="checkout_hour_meter" data-sortable="true" data-align="center" data-formatter="horimetro_checkout_formatter">checkout<br>horímetro</th>
+                <th data-field="checkin_obs" data-sortable="true" data-visible="false">checkin obs</th>
+                <th data-field="checkout_obs" data-sortable="true" data-visible="false">checkout obs</th>
+                <th data-field="id" data-sortable="false" data-align="center" data-formatter="id_formatter"></th>
             </tr>
         </thead>
         <tbody>
@@ -61,12 +62,13 @@
                 {% if request.user.profile != "SO" %}
                 <td>{{ check_in_out.boat }}</td>
                 {% endif %}
+                <td>{{ check_in_out.creator.get_full_name }}</td>
                 <td>{{ check_in_out.checkin_date|date:"Y-m-d" }}</td>
                 <td>{{ check_in_out.checkin_hour_meter }}</td>
                 <td>{{ check_in_out.checkout_date|date:"Y-m-d" }}</td>
                 <td>{{ check_in_out.checkout_hour_meter }}</td>
-                <td>{{ check_in_out.creator.get_full_name }}</td>
-                <td>{{ check_in_out.obs }}</td>
+                <td>{{ check_in_out.checkin_obs }}</td>
+                <td>{{ check_in_out.checkout_obs }}</td>
                 <td>{{ check_in_out.id }}</td>
             </tr>
             {% endfor %}
@@ -79,27 +81,39 @@
     const table = $('#table');
     var pagination = null;
 
-    window.date_formatter = (value, row, index, field) => {
+    window.checkin_date_formatter = (value, row, index, field) => {
         const date = new Date(value + 'T00:00:00');
-        return `<spam id="due_date-${row.id}">${date.toLocaleDateString()}</spam>`;
+        return `<spam id="checkin_date-${row.id}">${date.toLocaleDateString()}</spam>`;
     }
 
-    window.maintenance_formatter = (value, row, index, field) => {
+    window.checkout_date_formatter = (value, row, index, field) => {
+        if (value != '') {
+            const scheduleDate = new Date(value + 'T00:00:00');
+            value = scheduleDate.toLocaleDateString();
+        }
+        return `<spam id="checkout_date-${row.id}">${value}</spam>`;;
+    }
+
+    window.horimetro_checkout_formatter = (value, row, index, field) => {
         const maintenance = value === 'None' ? '' : value
-        return `<spam id="maintenance-${row.id}">${maintenance}</spam>`;
+        return `<spam id="horimetro-checkout-${row.id}">${maintenance}</spam>`;
     }
 
     window.id_formatter = (value, row, index, field) => {
+        console.log('checkout date', row.checkout_date)
         return `
         <div class="d-flex justify-content-center mt-3 mt-sm-0">
-            <button type="button" id="button-maintenance-${value}-${index}" class="btn btn-warning px-4 px-sm-1 me-3 me-sm-1
-            button-maintenance" title="gerar manutenção" ${row.maintenance === 'None' ? '' : 'disabled'}>
-                <i class="bi bi-wrench-adjustable"></i>
-            </button>
-            <a href="update/${value}" class="btn btn-primary px-4 px-sm-1 me-3 me-sm-1" title="editar ocorrência" id="update-${value}">
+            {% comment %} <button type="button" id="button-checkout-${value}-${index}" class="btn btn-warning px-4 px-sm-1 me-3 me-sm-1
+                button-checkout" title="fazer checkout" ${row.checkout_date !== '' ? 'disabled' : ''}>
+                <i class="bi bi-escape"></i>
+            </button> {% endcomment %}
+            <a href="checkout/${value}" class="btn btn-warning px-4 px-sm-1 me-3 me-sm-1" title="fazer checkout" id="update-${value}">
+                <i class="bi bi-escape"></i>
+            </a>
+            <a href="update/${value}" class="btn btn-primary px-4 px-sm-1 me-3 me-sm-1" title="editar checkin-checkout" id="update-${value}">
                 <i class="bi bi-pencil"></i>
             </a>
-            <button type="button" id="button-delete-${value}-${index}" class="btn btn-danger px-4 px-sm-1 me-3 me-sm-1 button-delete" title="apagar ocorrência">
+            <button type="button" id="button-delete-${value}-${index}" class="btn btn-danger px-4 px-sm-1 me-3 me-sm-1 button-delete" title="apagar checkin-checkout">
                 <i class="bi bi-trash"></i>
             </button>
         </div>`
@@ -109,9 +123,8 @@
         const maintenance = row.maintenance === 'None' ? '' : row.maintenance
         return `
         <p class="mb-1"><b>responsável:</b> ${row.creator}</p>
-        <p class="mb-1"><b>manutenção:</b> ${maintenance}</p>
-        <p class="mb-1"><b>hora do motor:</b> ${row.hour_meter}</p>
-        <p class="mb-1"><b>observações:</b> ${row.obs}</p>`
+        <p class="mb-1"><b>checkin obs:</b> ${row.checkin_obs}</p>
+        <p class="mb-1"><b>checkout obs:</b> ${row.checkout_obs}</p>`
     }
 
     $(function() {
@@ -120,18 +133,16 @@
                 const windowWidth = $(window).width();
                 if (windowWidth < 576) {
                     table.bootstrapTable('showColumn', 'creator');
-                    table.bootstrapTable('showColumn', 'maintenance');
-                    table.bootstrapTable('showColumn', 'hour_meter');
-                    table.bootstrapTable('showColumn', 'obs');
+                    table.bootstrapTable('showColumn', 'checkin_obs');
+                    table.bootstrapTable('showColumn', 'checkout_obs');
                     if (pagination === null || pagination) {
                         pagination = false;
                         table.bootstrapTable('togglePagination');
                     }
                 } else {
                     table.bootstrapTable('hideColumn', 'creator');
-                    table.bootstrapTable('hideColumn', 'maintenance');
-                    table.bootstrapTable('hideColumn', 'hour_meter');
-                    table.bootstrapTable('hideColumn', 'obs');
+                    table.bootstrapTable('hideColumn', 'checkin_obs');
+                    table.bootstrapTable('hideColumn', 'checkout_obs');
                     if (pagination === null) {
                         pagination = true;
                     } else if (!pagination) {
@@ -143,7 +154,7 @@
         });
     });
 
-    $(document).on('click', '.button-maintenance', function() {
+    $(document).on('click', '.button-checkout', function() {
         /**
          * Shows a modal to enter a date and them send an AJAX requisition
          * to create a new maintenance based on this occurrence and the date entered.
@@ -151,6 +162,7 @@
         const id = $(this).attr('id').split('-')[2];
         const index = $(this).attr('id').split('-')[3];
         const row = table.bootstrapTable('getData')[index];
+        console.log(row)
         const description = row.description;
         const sector = row.sector;
         const obs = row.obs;
@@ -161,7 +173,7 @@
         console.log(boat)
         const maintenance = row.maintenance;
         Swal.fire({
-            titleText: "Criar Manutenção",
+            titleText: "Checkout",
             theme: "{{ request.user.get_theme_display }}",
             buttonsStyling: false,
             showCancelButton: true,
@@ -251,10 +263,11 @@
         const id = $(this).attr('id').split('-')[2];
         const index = $(this).attr('id').split('-')[3];
         const row = table.bootstrapTable('getData')[index];
-        const description = row.description;
+        const checkin_date = new Date(row.checkin_date + 'T00:00:00').toLocaleDateString();
+        console.log(typeof(checkin_date))
         Swal.fire({
             title: "Você tem certeza?",
-            html: `você vai apagar a ocorrência:<br><b>${description}</b>`,
+            html: `você vai apagar o checkin de <b>${checkin_date}</b>`,
             icon: "warning",
             theme: '{{ request.user.get_theme_display }}',
             buttonsStyling: false,
@@ -269,7 +282,7 @@
         })
         .then((result) => {
             if (result.isConfirmed) {
-                const url = "{% url 'occurrence:delete-occurrence' 1 %}".replace('1', id);
+                const url = "{% url 'occurrence:delete-check-in-out' 1 %}".replace('1', id);
                 fetch(url, {method: "GET",})
                 .then(response => response.json())
                 .then(data => {

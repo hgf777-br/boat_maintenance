@@ -1,0 +1,80 @@
+{% extends "partials/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load boat_extras %}
+
+{% block content %}
+<form method="POST" class="needs-validation" novalidate>
+    {% csrf_token %}
+    <div class="row mb-2 g-2 align-items-end">
+        <div class="col-md-8">
+            <h3 class="align-bottom">Novo Check In</h3>
+        </div>
+        {% if request.user.profile != "SO" %}
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.boat }}
+                <label for="boat" class="form-label">{{ form.boat.label }}</label>
+            </div>
+        </div>
+        {% else %}
+        <input class="d-none" name="boat" id="id_boat" value="{{ request.user|boat }}" >
+        {% endif %}
+    </div>
+    <hr>
+    <div class="row mb-4 g-2">
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.checkin_date }}
+                <label for="checkin_date" class="form-label">{{ form.checkin_date.label }}</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.checkin_hour_meter }}
+                <label for="checkin_hour_meter" class="form-label">{{ form.checkin_hour_meter.label }}</label>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-3 g-2">
+        <div class="col">
+            <div class="form-floating">
+                {{ form.checkin_obs }}
+                <label for="checkin_obs" class="form-label">{{ form.checkin_obs.label }}</label>
+            </div>
+        </div>
+    </div>
+    <h4>Pendências do último Check Out</h4>
+    <hr>
+    <div class="row">
+        <div class="col">
+            <div class="float-end mb-3 me-2">
+                <button type="submit" class="btn btn-outline-success">Cadastrar</button>
+                <a href="{% url 'occurrence:table-check-in-outs' %}" class="btn btn-outline-danger ms-2">Cancelar</a>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock content %}
+
+{% block extra_javascript %}
+<script>
+    (() => {
+        'use strict'
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    console.log('erro')
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false)
+        })
+    })()
+</script>
+{% endblock extra_javascript %}

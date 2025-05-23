@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import (
+    CheckInOutCheckoutView,
     OccurrenceCreateView,
     OccurrenceDeleteView,
     OccurrenceUpdateView,
@@ -9,7 +10,7 @@ from .views import (
     CheckInOutsTableView,
     CheckInOutCreateView,
     CheckInOutUpdateView,
-    CheckInOutDeleteView,  # Create a check-in/check-out for an occurrence. This is a POST request.
+    CheckInOutDeleteView,
 )
 
 app_name = 'occurrence'
@@ -27,4 +28,5 @@ urlpatterns = [
     path('check_in_out/create/', CheckInOutCreateView.as_view(), name='create-check-in-out'),
     path('check_in_out/update/<int:pk>', CheckInOutUpdateView.as_view(), name='update-check-in-out'),
     path('check_in_out/delete/<int:pk>', CheckInOutDeleteView.as_view(), name='delete-check-in-out'),
+    path('check_in_out/checkout/<int:pk>', CheckInOutCheckoutView.as_view(), name='checkout-check-in-out'),
 ]

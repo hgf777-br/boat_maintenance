@@ -3,7 +3,7 @@ import json
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse_lazy
 from django.views.generic import ListView, View
 from django.views.generic.edit import CreateView, UpdateView
@@ -12,8 +12,8 @@ from rest_framework import serializers
 from boat.models import Boat
 from maintenance.models import Maintenance, Sectors
 
-from .forms import CheckInOutForm, OccurrenceForm
-from .models import CheckInOut, Occurrence
+from .forms import CheckInOutForm, CheckOutForm, OccurrenceForm
+from .models import CheckInOut, Item, Occurrence
 
 
 class OccurrencesTableView(LoginRequiredMixin, ListView):
@@ -118,35 +118,62 @@ class CheckInOutsTableView(LoginRequiredMixin, ListView):
 class CheckInOutCreateView(LoginRequiredMixin, CreateView):
     model = CheckInOut
     form_class = CheckInOutForm
-    template_name = "check_in_out/create_check_in_out.html"
+    template_name = "check_in_out/create_check_in.html"
     success_url = reverse_lazy("occurrence:table-check-in-outs")
 
     def form_valid(self, form):
-        occurrence = form.save(commit=False)
-        occurrence.creator = self.request.user
-        occurrence.save()
-        messages.success(self.request, 'Ocorrência criada com sucesso')
+        check_in_out = form.save(commit=False)
+        check_in_out.creator = self.request.user
+        check_in_out.save()
+        messages.success(self.request, 'Checkin criado com sucesso')
         return HttpResponseRedirect(self.success_url)
 
 
 class CheckInOutUpdateView(LoginRequiredMixin, UpdateView):
     model = CheckInOut
     form_class = CheckInOutForm
-    template_name = "occurrence/update_occurrence.html"
-    success_url = reverse_lazy("occurrence:table-occurrences")
+    template_name = "check_in_out/update_check_in_out.html"
+    success_url = reverse_lazy("occurrence:table-check-in-outs")
 
     def form_valid(self, form):
-        messages.success(self.request, 'Ocorrência atualizada com sucesso')
+        messages.success(self.request, 'Checkin atualizado com sucesso')
         return super().form_valid(form)
 
 
 class CheckInOutDeleteView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         try:
-            occurrence = CheckInOut.objects.get(pk=kwargs["pk"])
-            occurrence.delete()
-            return JsonResponse({"status": "ok", "message": "Ocorrência excluída com sucesso"})
+            check_in_out = CheckInOut.objects.get(pk=kwargs["pk"])
+            check_in_out.delete()
+            return JsonResponse({"status": "ok", "message": "CheckIn excluído com sucesso"})
         except ObjectDoesNotExist:
-            return JsonResponse({"status": "error", "message": "Ocorrência não encontrada"})
+            return JsonResponse({"status": "error", "message": "CheckIn não encontrado"})
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)})
+
+
+class CheckInOutCheckoutView(LoginRequiredMixin, UpdateView):
+    model = CheckInOut
+    form_class = CheckOutForm
+    template_name = "check_in_out/check_out.html"
+    success_url = reverse_lazy("occurrence:table-check-in-outs")
+
+    def setup(self, request, *args, **kwargs):
+        all_items = Item.objects.all().order_by('name')
+        self.items = {
+            sector[1]: [
+                item.name for item in all_items if item.sector == sector[0]
+            ] for sector in Sectors.choices
+        }
+        return super().setup(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["items"] = self.items
+
+        return context
+
+    def form_valid(self, form):
+        print(self.request.POST)
+        messages.success(self.request, 'Checkout realizado com sucesso')
+        return super().form_valid(form)

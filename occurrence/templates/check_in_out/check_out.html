@@ -1,0 +1,126 @@
+{% extends "partials/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load boat_extras %}
+
+{% block content %}
+<form method="POST" class="needs-validation" novalidate>
+    {% csrf_token %}
+    <div class="row mb-2 g-2 align-items-end">
+        <div class="col-md-8">
+            <h3 class="align-bottom">Check Out</h3>
+        </div>
+        {% if request.user.profile != "SO" %}
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.boat }}
+                <label for="boat" class="form-label">{{ form.boat.label }}</label>
+            </div>
+        </div>
+        {% else %}
+        <input class="d-none" name="boat" id="id_boat" value="{{ request.user|boat }}" >
+        {% endif %}
+    </div>
+    <hr>
+    <div class="row mb-4 g-2">
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.checkout_date }}
+                <label for="checkout_date" class="form-label">{{ form.checkout_date.label }}</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form.checkout_hour_meter }}
+                <label for="checkout_hour_meter" class="form-label">{{ form.checkout_hour_meter.label }}</label>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-3 g-2">
+        <div class="col">
+            <div class="form-floating">
+                {{ form.checkout_obs }}
+                <label for="checkout_obs" class="form-label">{{ form.checkout_obs.label }}</label>
+            </div>
+        </div>
+    </div>
+    <h3 class="mb-3">Itens para Checkout</h3>
+    <div class="row mb-4 g-2">
+        {% for key, values in items.items %}
+            {% if values|length %}
+                <h4 class="">{{ key }}</h4>
+                {% for item in values %}
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="mb-3">
+                            <h5>{{ item }}</h5>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" value="problem" name="{{key}}-item-{{forloop.counter0}}" id="{{key}}-item-{{forloop.counter0}}-problem">
+                                <label class="form-check-label" for="item-{{forloop.counter0}}-problem">problema</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" value="normal" name="{{key}}-item-{{forloop.counter0}}" id="{{key}}-item-{{forloop.counter0}}-normal">
+                                <label class="form-check-label" for="item-{{forloop.counter0}}-normal">normal</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" value="not_used" name="{{key}}-item-{{forloop.counter0}}" id="{{key}}-item-{{forloop.counter0}}-not-used" checked>
+                                <label class="form-check-label" for="item-{{forloop.counter0}}-not-used">não usei</label>
+                            </div>
+                            <div class="mb-3 d-none" id="field-obs-{{key}}-item-{{forloop.counter0}}">
+                                <label for="obs-{{forloop.counter0}}" class="form-label">obs</label>
+                                <textarea class="form-control" id="{{key}}-obs-{{forloop.counter0}}" name="{{key}}-obs-{{forloop.counter0}}" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                <hr>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <hr>
+    <hr>
+    <div class="row">
+        <div class="col">
+            <div class="float-end mb-3 me-2">
+                <button type="submit" class="btn btn-outline-success">Realizar</button>
+                <a href="{% url 'occurrence:table-check-in-outs' %}" class="btn btn-outline-danger ms-2">Cancelar</a>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock content %}
+
+{% block extra_javascript %}
+<script>
+    (() => {
+        'use strict'
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false)
+        })
+
+        // Adiciona o evento para mostrar/esconder o campo de observações
+        $(".form-check-inline input").change(function() {
+            console.log('mu', $(this))
+            const value = $(this).val();
+            console.log(value)
+            const idFieldObs = `#field-obs-${$(this).attr('name')}`;
+            console.log(idFieldObs)
+            const fieldObs = $(idFieldObs);
+            if ($(this).val() === 'problem') {
+                fieldObs.removeClass('d-none');
+            } else {
+                fieldObs.addClass('d-none');
+            }
+        });
+    })()
+</script>
+{% endblock extra_javascript %}

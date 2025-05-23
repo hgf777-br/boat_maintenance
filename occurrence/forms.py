@@ -63,5 +63,32 @@ class CheckInOutForm(forms.ModelForm):
             'checkout_obs',
         )
         widgets = {
-            'date': forms.TextInput(attrs={'type': 'date'}),
+            'checkin_date': forms.TextInput(attrs={'type': 'date'}),
+            'checkout_date': forms.TextInput(attrs={'type': 'date'}),
+        }
+
+
+class CheckOutForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['boat'].widget.attrs = {'class': 'form-select', 'placeholder': '#', 'autofocus': ''}
+        self.fields['boat'].empty_label = None
+        self.fields['checkout_date'].widget.attrs = {'class': 'form-control', 'placeholder': '#', 'required': True}
+        self.fields['checkout_date'].initial = datetime.now().date()
+        self.fields['checkout_hour_meter'].widget.attrs = {'class': 'form-control', 'placeholder': '#', 'required': True}
+        self.fields['checkout_obs'].widget.attrs = {'class': 'form-control',
+                                                   'placeholder': '#', 'style': 'height: 100px'}
+        if self.instance:
+            print(f'CheckInOut ID: {self.instance.id}')
+
+    class Meta:
+        model = CheckInOut
+        fields = (
+            'boat',
+            'checkout_date',
+            'checkout_hour_meter',
+            'checkout_obs',
+        )
+        widgets = {
+            'checkout_date': forms.TextInput(attrs={'type': 'date'}),
         }

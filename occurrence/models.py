@@ -42,8 +42,8 @@ class CheckInOut(models.Model):
     checkin_obs = models.TextField(verbose_name=_("observation"), blank=True)
     checkout_date = models.DateField(verbose_name=_("date"), blank=True, null=True)
     checkout_hour_meter = models.PositiveIntegerField(verbose_name=_("hour meter"), blank=True, null=True)
-    checkout_items = models.ManyToManyField(Item, through="CheckInOutItem", verbose_name=_("items"))
     checkout_obs = models.TextField(verbose_name=_("observation"), blank=True)
+    checkout_items = models.ManyToManyField(Item, through="CheckInOutItem", verbose_name=_("items"))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("created at"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("updated at"))
 
