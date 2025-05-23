@@ -28,20 +28,30 @@
         </div>
     </div>
     <div class="row mb-4 g-2">
-        <div class="col-md-4">
+        <div class=
+            {% if request.user.profile == 'MS' %}
+            "col-md-4">
+            {% else %}
+            "col-md-6">
+            {% endif %}
             <div class="form-floating">
                 {{ form.phone }}
                 <label for="phone" class="form-label">{{ form.phone.label }}</label>
                 <div class="invalid-feedback">Apenas números neste campo</div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 {% if request.user.profile != 'MS' %}d-none{% endif %}">
             <div class="form-floating">
                 {{ form.profile }}
                 <label for="profile" class="form-label">{{ form.profile.label }}</label>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class=
+            {% if request.user.profile == 'MS' %}
+            "col-md-4">
+            {% else %}
+            "col-md-6">
+            {% endif %}
             <div class="form-floating">
                 {{ form.theme }}
                 <label for="theme" class="form-label">{{ form.theme.label }}</label>
@@ -106,7 +116,7 @@
         const forms = document.querySelectorAll('.needs-validation')
         const username = document.getElementById('id_username');
         const phone = document.getElementById('id_phone');
-        
+
         // Loop over them and prevent submission
         Array.from(forms).forEach(form => {
             form.addEventListener('submit', event => {
